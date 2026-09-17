@@ -9,6 +9,9 @@ interface ServicesMarketplaceProps {
   onRequestService: (service: Service) => void;
   selectedCategoryFilter?: string;
   onClearCategoryFilter?: () => void;
+  showPricing?: boolean;
+  showFeatures?: boolean;
+  showServices?: boolean;
 }
 
 export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
@@ -16,9 +19,23 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
   onViewDetails,
   onRequestService,
   selectedCategoryFilter,
-  onClearCategoryFilter
+  onClearCategoryFilter,
+  showPricing = true,
+  showFeatures = true,
+  showServices = true
 }) => {
   const [activeTab, setActiveTab] = useState<string>(selectedCategoryFilter || 'ALL');
+
+  if (showServices === false) {
+    return (
+      <section id="services" className="py-16 bg-slate-950 text-slate-100 border-t border-slate-900">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h3 className="text-xl font-bold text-white mb-2">Services Catalog</h3>
+          <p className="text-sm text-slate-400">Services catalog is currently undergoing scheduled updates. Please contact directly for custom quotes and project availability.</p>
+        </div>
+      </section>
+    );
+  }
 
   // Categories list
   const categories = [
@@ -107,22 +124,24 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
                 </p>
 
                 {/* Key Deliverables */}
-                <div className="mb-5 space-y-1.5 pt-3 border-t border-slate-800/80">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold block mb-2">
-                    What is Included:
-                  </span>
-                  {service.includedFeatures.slice(0, 4).map((feat, idx) => (
-                    <div key={idx} className="flex items-center space-x-2 text-xs text-slate-300">
-                      <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                      <span className="truncate">{feat}</span>
-                    </div>
-                  ))}
-                  {service.includedFeatures.length > 4 && (
-                    <span className="text-[11px] text-cyan-400/80 font-mono block pl-5 pt-0.5">
-                      +{service.includedFeatures.length - 4} more deliverables
+                {showFeatures && (
+                  <div className="mb-5 space-y-1.5 pt-3 border-t border-slate-800/80">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold block mb-2">
+                      What is Included:
                     </span>
-                  )}
-                </div>
+                    {service.includedFeatures.slice(0, 4).map((feat, idx) => (
+                      <div key={idx} className="flex items-center space-x-2 text-xs text-slate-300">
+                        <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span className="truncate">{feat}</span>
+                      </div>
+                    ))}
+                    {service.includedFeatures.length > 4 && (
+                      <span className="text-[11px] text-cyan-400/80 font-mono block pl-5 pt-0.5">
+                        +{service.includedFeatures.length - 4} more deliverables
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Tools & Technologies */}
                 <div className="mb-6 flex flex-wrap gap-1.5">
@@ -142,10 +161,10 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
                 <div className="flex items-center justify-between mb-5 bg-slate-950/60 px-3.5 py-2.5 rounded-xl border border-slate-800/60">
                   <div>
                     <span className="text-[10px] uppercase font-mono text-slate-400 block">
-                      Starting Price
+                      {showPricing ? 'Starting Price' : 'Pricing Structure'}
                     </span>
                     <span className="text-sm font-bold text-white font-mono flex items-center text-cyan-300">
-                      {service.startingPrice}
+                      {showPricing ? service.startingPrice : 'Custom Quote'}
                     </span>
                   </div>
                   <div className="text-right">

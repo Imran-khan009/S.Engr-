@@ -21,6 +21,9 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { ProjectRequestModal } from './components/ProjectRequestModal';
 import { AdminDashboard } from './components/AdminDashboard';
+import { DemoBanner } from './components/DemoBanner';
+import { DemoComparisonModal } from './components/DemoComparisonModal';
+import { CustomWebsiteModal } from './components/CustomWebsiteModal';
 import { Loader2 } from 'lucide-react';
 
 export default function App() {
@@ -31,6 +34,8 @@ export default function App() {
 
   // Modals state
   const [isProjectModalOpen, setIsProjectModalOpen] = useState<boolean>(false);
+  const [isComparisonModalOpen, setIsComparisonModalOpen] = useState<boolean>(false);
+  const [isCustomWebsiteModalOpen, setIsCustomWebsiteModalOpen] = useState<boolean>(false);
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<Service | null>(null);
   const [selectedDetailService, setSelectedDetailService] = useState<Service | null>(null);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | undefined>(undefined);
@@ -125,10 +130,20 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-slate-950">
+      {/* Top Demo Banner if demoMode is active */}
+      {siteData?.settings?.demoMode !== false && (
+        <DemoBanner
+          onOpenComparison={() => setIsComparisonModalOpen(true)}
+          onRequestCustom={() => setIsCustomWebsiteModalOpen(true)}
+        />
+      )}
+
       {/* Navigation */}
       <Navbar
         onOpenHireModal={handleOpenHireModal}
         onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenCustomModal={() => setIsCustomWebsiteModalOpen(true)}
+        demoMode={siteData?.settings?.demoMode !== false}
         activeSection={activeSection}
       />
 
@@ -152,13 +167,16 @@ export default function App() {
         />
 
         {/* Sections 3 - 14: Services Marketplace */}
-        {siteData?.services && (
+        {siteData?.services && (siteData.settings?.showServices ?? true) && (
           <ServicesMarketplace
             services={siteData.services}
             onViewDetails={(service) => setSelectedDetailService(service)}
             onRequestService={(service) => handleOpenProjectModal(service)}
             selectedCategoryFilter={selectedCategoryFilter}
             onClearCategoryFilter={() => setSelectedCategoryFilter(undefined)}
+            showPricing={siteData.settings?.showPricing ?? true}
+            showFeatures={siteData.settings?.showFeatures ?? true}
+            showServices={siteData.settings?.showServices ?? true}
           />
         )}
 
@@ -172,11 +190,19 @@ export default function App() {
 
         {/* Section 15: Need a Professional Solution? Hire Me */}
         <HireMeSection
+          onViewDemo={() => setIsComparisonModalOpen(true)}
+          onRequestCustomWebsite={() => setIsCustomWebsiteModalOpen(true)}
+          onContactMe={() => {
+            const el = document.getElementById('contact');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          }}
           onStartProject={() => handleOpenProjectModal()}
           onViewServices={() => {
             const el = document.getElementById('services');
             el?.scrollIntoView({ behavior: 'smooth' });
           }}
+          ctaTitle={siteData?.settings?.ctaTitle}
+          ctaSupportingText={siteData?.settings?.ctaSupportingText}
           whatsappNumber={siteData?.settings?.whatsapp}
         />
 
@@ -219,6 +245,7 @@ export default function App() {
           email={siteData?.settings?.email}
           whatsapp={siteData?.settings?.whatsapp}
           location={siteData?.settings?.location}
+          socials={siteData?.socials}
         />
       </main>
 
@@ -259,6 +286,26 @@ export default function App() {
         onClose={() => setIsAdminOpen(false)}
         siteData={siteData}
         onRefreshData={fetchSiteData}
+      />
+
+      {/* Demo vs. Paid Comparison Modal */}
+      <DemoComparisonModal
+        isOpen={isComparisonModalOpen}
+        onClose={() => setIsComparisonModalOpen(false)}
+        onRequestCustom={() => {
+          setIsComparisonModalOpen(false);
+          setIsCustomWebsiteModalOpen(true);
+        }}
+        premiumFeatures={siteData?.settings?.premiumFeatures}
+      />
+
+      {/* Custom Website Requirements Intake Modal */}
+      <CustomWebsiteModal
+        isOpen={isCustomWebsiteModalOpen}
+        onClose={() => setIsCustomWebsiteModalOpen(false)}
+        onRequestSubmitted={() => {
+          fetchSiteData();
+        }}
       />
     </div>
   );

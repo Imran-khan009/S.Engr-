@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { FullSiteData, Lead, LeadStatus, Service, Project, SocialPlatform } from '../types';
+import {
+  FullSiteData,
+  Lead,
+  LeadStatus,
+  Service,
+  Project,
+  SocialPlatform,
+  CustomWebsiteRequest,
+  CustomRequestStatus,
+  SiteSettings
+} from '../types';
 import {
   X,
   Lock,
@@ -14,8 +24,12 @@ import {
   RefreshCw,
   ExternalLink,
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  Rocket,
+  Sliders
 } from 'lucide-react';
+import { AdminCustomRequestsTab } from './AdminCustomRequestsTab';
+import { AdminDemoSettingsTab } from './AdminDemoSettingsTab';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -35,11 +49,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [passkey, setPasskey] = useState('');
   const [token, setToken] = useState<string | null>(localStorage.getItem('admin_token'));
   const [authError, setAuthError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'leads' | 'services' | 'projects' | 'socials' | 'settings'>('leads');
+  const [activeTab, setActiveTab] = useState<
+    'leads' | 'customRequests' | 'services' | 'socials' | 'demoSettings' | 'settings'
+  >('leads');
 
   // Leads state
   const [leads, setLeads] = useState<Lead[]>(siteData?.leads || []);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+
+  // Custom Website Requests state
+  const [customRequests, setCustomRequests] = useState<CustomWebsiteRequest[]>(siteData?.customRequests || []);
 
   // Services editable copy
   const [services, setServices] = useState<Service[]>(siteData?.services || []);
@@ -48,13 +67,63 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Social links editable copy
   const [socials, setSocials] = useState<SocialPlatform[]>(siteData?.socials || []);
 
+  // Settings state
+  const [settings, setSettings] = useState<SiteSettings>(() => {
+    if (siteData?.settings) return siteData.settings;
+    return {
+      brandName: 'S • ENGR',
+      professionalName: 'Engr. Imran Khan',
+      positioning: 'Technology • IoT • Creative Design • Digital Marketing • Construction & Design • Teaching',
+      brandConcept: 'Learn • Create • Build • Teach • Hire',
+      heroHeading: 'BUILD. DESIGN. TEACH. SOLVE.',
+      heroSupporting: 'Technology, Creative Design & Real-World Solutions — Built with Purpose.',
+      heroDescription: 'Computer systems engineer, technical instructor, IoT developer, and creative design strategist.',
+      adminPasskey: 'engr-imran-2025',
+      email: 'contact.engrimran@gmail.com',
+      whatsapp: '03331244214',
+      location: 'HUB Chowki Balochistan',
+      demoMode: true,
+      showPricing: true,
+      showServices: true,
+      showFeatures: true,
+      ctaTitle: 'Need a Customized Website?',
+      ctaSupportingText:
+        'Explore the demo or request a fully customized version built around your brand, services and business goals.',
+      upgradeMessage: 'Ready to build your bespoke digital platform?',
+      premiumFeatures: {
+        customBranding: true,
+        customColors: true,
+        customTypography: true,
+        customSections: true,
+        advancedAnimations: true,
+        advancedPortfolioLayouts: true,
+        customServicePages: true,
+        advancedContactLeadSystem: true,
+        customerDashboard: true,
+        adminCMS: true,
+        advancedAnalytics: true,
+        customDomainSupport: true,
+        advancedSEO: true,
+        blogSystem: true,
+        bookingSystem: true,
+        clientPortal: true,
+        paymentIntegration: true,
+        customApiIntegrations: true
+      }
+    };
+  });
+
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     if (siteData) {
       setLeads(siteData.leads || []);
+      setCustomRequests(siteData.customRequests || []);
       setServices(siteData.services || []);
       setSocials(siteData.socials || []);
+      if (siteData.settings) {
+        setSettings(siteData.settings);
+      }
       if (!selectedService && siteData.services?.[0]) {
         setSelectedService(siteData.services[0]);
       }
@@ -65,6 +134,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setNotification({ message: msg, type });
     setTimeout(() => setNotification(null), 4000);
   };
+
+  const fetchAdminData = async (authToken?: string) => {
+    const currentToken = authToken || token;
+    if (!currentToken) return;
+    try {
+      const res = await fetch('/api/admin/data', {
+        headers: { Authorization: `Bearer ${currentToken}` }
+      });
+      if (!res.ok) {
+        if (res.status === 401) {
+          handleLogout();
+        }
+        return;
+      }
+      const data = await res.json();
+      if (data.leads) setLeads(data.leads);
+      if (data.customRequests) setCustomRequests(data.customRequests);
+      if (data.services) setServices(data.services);
+      if (data.socials) setSocials(data.socials);
+      if (data.settings) setSettings(data.settings);
+    } catch (err) {
+      console.error('Failed to load admin data:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchAdminData(token);
+    }
+  }, [token]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +179,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setToken(data.token);
       localStorage.setItem('admin_token', data.token);
       showNotification('Admin login successful.');
+      fetchAdminData(data.token);
     } catch (err: any) {
       setAuthError(err.message || 'Invalid passkey.');
     }
@@ -161,6 +261,67 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to save social platforms');
       showNotification('Platform links & handles updated successfully.');
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  const handleCustomRequestStatus = async (
+    id: string,
+    status: CustomRequestStatus,
+    adminNotes?: string
+  ) => {
+    try {
+      const res = await fetch('/api/admin/custom-requests/status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ id, status, adminNotes })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update custom request status');
+      setCustomRequests(prev => prev.map(r => r.id === id ? data.request : r));
+      showNotification(`Custom request updated to ${status}`);
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  const handleDeleteCustomRequest = async (id: string) => {
+    if (!window.confirm('Delete this custom website request record?')) return;
+    try {
+      const res = await fetch(`/api/admin/custom-requests/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete custom request');
+      setCustomRequests(prev => prev.filter(r => r.id !== id));
+      showNotification('Custom website request removed.');
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(settings)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save settings');
+      setSettings(data.settings);
+      showNotification('Demo mode & Premium settings saved successfully!');
       await onRefreshData();
     } catch (err: any) {
       showNotification(err.message, 'error');
@@ -296,7 +457,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="flex items-center px-6 border-b border-slate-800 bg-slate-950/40 overflow-x-auto gap-4 py-2">
               <button
                 onClick={() => setActiveTab('leads')}
-                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 ${
+                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap ${
                   activeTab === 'leads' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -304,8 +465,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span>Customer Leads ({leads.length})</span>
               </button>
               <button
+                onClick={() => setActiveTab('customRequests')}
+                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap ${
+                  activeTab === 'customRequests' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Rocket className="w-3.5 h-3.5" />
+                <span>Custom Requests ({customRequests.length})</span>
+              </button>
+              <button
                 onClick={() => setActiveTab('services')}
-                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 ${
+                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap ${
                   activeTab === 'services' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -314,16 +484,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </button>
               <button
                 onClick={() => setActiveTab('socials')}
-                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 ${
+                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap ${
                   activeTab === 'socials' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <ExternalLink className="w-3.5 h-3.5" />
-                <span>Freelance & Social Links</span>
+                <span>Freelance & Socials</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('demoSettings')}
+                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap ${
+                  activeTab === 'demoSettings' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Demo & Premium Controls</span>
               </button>
               <button
                 onClick={() => setActiveTab('settings')}
-                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 ${
+                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap ${
                   activeTab === 'settings' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -655,6 +834,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Tab: Custom Website Upgrade Requests */}
+            {activeTab === 'customRequests' && (
+              <AdminCustomRequestsTab
+                requests={customRequests}
+                onUpdateStatus={handleCustomRequestStatus}
+                onDeleteRequest={handleDeleteCustomRequest}
+              />
+            )}
+
+            {/* Tab: Demo Mode & Premium Controls */}
+            {activeTab === 'demoSettings' && (
+              <AdminDemoSettingsTab
+                settings={settings}
+                onChangeSettings={setSettings}
+                onSaveSettings={handleSaveSettings}
+              />
             )}
 
             {/* Tab 4: Reset & Database Maintenance */}

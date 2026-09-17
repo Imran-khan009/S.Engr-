@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { FullSiteData, Lead, ContactMessage, Service, Project, SiteSettings } from '../src/types';
+import { FullSiteData, Lead, ContactMessage, Service, Project, SiteSettings, CustomWebsiteRequest, CustomRequestStatus } from '../src/types';
 import { defaultSiteData } from './defaultData';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -21,11 +21,18 @@ export function initDatabase(): FullSiteData {
     const raw = fs.readFileSync(DATA_FILE, 'utf-8');
     const parsed = JSON.parse(raw) as FullSiteData;
     
-    // Ensure all keys exist
+    // Ensure all keys and nested settings exist
     const merged: FullSiteData = {
       ...defaultSiteData,
       ...parsed,
-      settings: { ...defaultSiteData.settings, ...(parsed.settings || {}) },
+      settings: {
+        ...defaultSiteData.settings,
+        ...(parsed.settings || {}),
+        premiumFeatures: {
+          ...defaultSiteData.settings.premiumFeatures,
+          ...((parsed.settings && parsed.settings.premiumFeatures) || {})
+        }
+      },
       services: parsed.services?.length ? parsed.services : defaultSiteData.services,
       projects: parsed.projects?.length ? parsed.projects : defaultSiteData.projects,
       experiences: parsed.experiences?.length ? parsed.experiences : defaultSiteData.experiences,
@@ -33,7 +40,8 @@ export function initDatabase(): FullSiteData {
       skillCategories: parsed.skillCategories?.length ? parsed.skillCategories : defaultSiteData.skillCategories,
       socials: parsed.socials?.length ? parsed.socials : defaultSiteData.socials,
       leads: parsed.leads || [],
-      messages: parsed.messages || []
+      messages: parsed.messages || [],
+      customRequests: parsed.customRequests || []
     };
 
     return merged;
@@ -140,6 +148,53 @@ export function updateSettings(settings: Partial<SiteSettings>): SiteSettings {
   db.settings = { ...db.settings, ...settings };
   saveDatabase(db);
   return db.settings;
+}
+
+export function addCustomWebsiteRequest(
+  req: Omit<CustomWebsiteRequest, 'id' | 'createdAt' | 'status'> & { status?: CustomRequestStatus }
+): CustomWebsiteRequest {
+  const db = getDatabase();
+  const newRequest: CustomWebsiteRequest = {
+    ...req,
+    id: `req-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    status: req.status || 'NEW',
+    createdAt: new Date().toISOString()
+  };
+  if (!db.customRequests) {
+    db.customRequests = [];
+  }
+  db.customRequests.unshift(newRequest);
+  saveDatabase(db);
+  return newRequest;
+}
+
+export function updateCustomWebsiteRequestStatus(
+  id: string,
+  status: CustomRequestStatus,
+  adminNotes?: string
+): CustomWebsiteRequest | null {
+  const db = getDatabase();
+  if (!db.customRequests) db.customRequests = [];
+  const index = db.customRequests.findIndex(r => r.id === id);
+  if (index === -1) return null;
+  db.customRequests[index].status = status;
+  if (adminNotes !== undefined) {
+    db.customRequests[index].adminNotes = adminNotes;
+  }
+  saveDatabase(db);
+  return db.customRequests[index];
+}
+
+export function deleteCustomWebsiteRequest(id: string): boolean {
+  const db = getDatabase();
+  if (!db.customRequests) return false;
+  const initialLen = db.customRequests.length;
+  db.customRequests = db.customRequests.filter(r => r.id !== id);
+  if (db.customRequests.length !== initialLen) {
+    saveDatabase(db);
+    return true;
+  }
+  return false;
 }
 
 export function resetToDefaults(): FullSiteData {

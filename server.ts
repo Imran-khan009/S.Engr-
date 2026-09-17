@@ -11,9 +11,26 @@ import {
   updateProject,
   updateSettings,
   resetToDefaults,
-  saveDatabase
+  saveDatabase,
+  addCustomWebsiteRequest,
+  updateCustomWebsiteRequestStatus,
+  deleteCustomWebsiteRequest
 } from './server/db';
-import { LeadStatus } from './src/types';
+import { LeadStatus, CustomRequestStatus } from './src/types';
+import { createClient } from '@supabase/supabase-js';
+
+// Lazy Supabase helper
+function getSupabaseClient() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  try {
+    return createClient(url, key);
+  } catch (e) {
+    console.warn('Failed to initialize Supabase client:', e);
+    return null;
+  }
+}
 
 // Admin session store (in-memory for active sessions)
 const activeAdminTokens = new Set<string>();
@@ -48,10 +65,12 @@ async function startServer() {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  // Public Site Data
+  // Public Site Data (includes leads and customRequests for authenticated admins)
   app.get('/api/site-data', (req, res) => {
     try {
       const db = getDatabase();
+      const authHeader = req.headers.authorization;
+      const isAdmin = authHeader?.startsWith('Bearer ') && activeAdminTokens.has(authHeader.substring(7));
       // Omit private admin passkey from public response
       const { adminPasskey, ...publicSettings } = db.settings;
       res.json({
@@ -62,6 +81,8 @@ async function startServer() {
         education: db.education,
         skillCategories: db.skillCategories,
         socials: db.socials,
+        leads: isAdmin ? db.leads : [],
+        customRequests: isAdmin ? db.customRequests : [],
         stats: {
           servicesCount: db.services.length,
           projectsCount: db.projects.length,
@@ -140,6 +161,103 @@ async function startServer() {
       });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to submit project request', details: err?.message });
+    }
+  });
+
+  // Submit Custom Website Upgrade Request (Save to DB & Supabase if configured)
+  app.post('/api/custom-website-requests', async (req, res) => {
+    try {
+      const {
+        fullName,
+        email,
+        whatsapp,
+        businessName,
+        websiteType,
+        requiredServices,
+        designPreference,
+        requiredFeatures,
+        budget,
+        deadline,
+        additionalRequirements
+      } = req.body;
+
+      if (!fullName || !email) {
+        res.status(400).json({ error: 'Please provide at least your Name and Email.' });
+        return;
+      }
+
+      const servicesArray = Array.isArray(requiredServices)
+        ? requiredServices
+        : requiredServices ? [String(requiredServices)] : ['Modern Web & UI Development'];
+
+      const featuresArray = Array.isArray(requiredFeatures)
+        ? requiredFeatures
+        : requiredFeatures ? [String(requiredFeatures)] : [];
+
+      const newRequest = addCustomWebsiteRequest({
+        fullName: String(fullName).trim(),
+        email: String(email).trim().toLowerCase(),
+        whatsapp: String(whatsapp || '').trim(),
+        businessName: String(businessName || '').trim(),
+        websiteType: String(websiteType || 'Custom Business Website').trim(),
+        requiredServices: servicesArray,
+        designPreference: String(designPreference || 'Modern Tech & Minimalist').trim(),
+        requiredFeatures: featuresArray,
+        budget: String(budget || 'Custom Quote').trim(),
+        deadline: String(deadline || 'Flexible').trim(),
+        additionalRequirements: String(additionalRequirements || '').trim(),
+        status: 'NEW'
+      });
+
+      // Save to Supabase if configured
+      let supabaseSynced = false;
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        try {
+          const { error: sbError } = await supabase
+            .from('custom_website_requests')
+            .insert([{
+              id: newRequest.id,
+              full_name: newRequest.fullName,
+              email: newRequest.email,
+              whatsapp: newRequest.whatsapp,
+              business_name: newRequest.businessName,
+              website_type: newRequest.websiteType,
+              required_services: newRequest.requiredServices,
+              design_preference: newRequest.designPreference,
+              required_features: newRequest.requiredFeatures,
+              budget: newRequest.budget,
+              deadline: newRequest.deadline,
+              additional_requirements: newRequest.additionalRequirements,
+              status: newRequest.status,
+              created_at: newRequest.createdAt
+            }]);
+
+          if (!sbError) {
+            supabaseSynced = true;
+            newRequest.supabaseSynced = true;
+            const db = getDatabase();
+            const target = db.customRequests?.find(r => r.id === newRequest.id);
+            if (target) {
+              target.supabaseSynced = true;
+              saveDatabase(db);
+            }
+          } else {
+            console.warn('Supabase insertion notice:', sbError.message);
+          }
+        } catch (sbErr: any) {
+          console.warn('Supabase sync notice:', sbErr.message);
+        }
+      }
+
+      res.status(201).json({
+        success: true,
+        message: 'Your custom website requirements have been submitted successfully! Engr. Imran Khan will review your specifications and contact you promptly.',
+        request: newRequest,
+        supabaseSynced
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: 'Failed to submit custom website request', details: err?.message });
     }
   });
 
@@ -265,6 +383,44 @@ async function startServer() {
       res.json({ success });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to delete lead', details: err?.message });
+    }
+  });
+
+  // Update Custom Website Request Status
+  app.post('/api/admin/custom-requests/status', adminAuthMiddleware, (req, res) => {
+    try {
+      const { id, status, adminNotes } = req.body;
+      const validStatuses: CustomRequestStatus[] = [
+        'NEW',
+        'REVIEWING',
+        'PROPOSAL_SENT',
+        'ACCEPTED',
+        'IN_DEVELOPMENT',
+        'DELIVERED',
+        'ARCHIVED'
+      ];
+      if (!validStatuses.includes(status)) {
+        res.status(400).json({ error: 'Invalid custom request status' });
+        return;
+      }
+      const updated = updateCustomWebsiteRequestStatus(id, status, adminNotes);
+      if (!updated) {
+        res.status(404).json({ error: 'Custom request not found' });
+        return;
+      }
+      res.json({ success: true, request: updated });
+    } catch (err: any) {
+      res.status(500).json({ error: 'Failed to update custom request status', details: err?.message });
+    }
+  });
+
+  // Delete Custom Website Request
+  app.delete('/api/admin/custom-requests/:id', adminAuthMiddleware, (req, res) => {
+    try {
+      const success = deleteCustomWebsiteRequest(req.params.id);
+      res.json({ success });
+    } catch (err: any) {
+      res.status(500).json({ error: 'Failed to delete custom request', details: err?.message });
     }
   });
 

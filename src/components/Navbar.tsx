@@ -4,12 +4,16 @@ import { Menu, X, Shield, ArrowRight, Sparkles } from 'lucide-react';
 interface NavbarProps {
   onOpenHireModal: (preselectedService?: string) => void;
   onOpenAdmin: () => void;
+  onOpenCustomModal?: () => void;
+  demoMode?: boolean;
   activeSection: string;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenHireModal,
   onOpenAdmin,
+  onOpenCustomModal,
+  demoMode = true,
   activeSection
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -70,6 +74,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   S • ENGR
                 </span>
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                {demoMode && (
+                  <span className="ml-1.5 px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-bold tracking-wider">
+                    DEMO
+                  </span>
+                )}
               </div>
             </div>
           </a>
@@ -98,6 +107,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Action CTAs & Admin Switcher */}
           <div className="hidden sm:flex items-center space-x-3">
+            {/* Custom Website Request CTA */}
+            {onOpenCustomModal && (
+              <button
+                id="nav-custom-website-btn"
+                onClick={onOpenCustomModal}
+                className="px-3.5 py-2 rounded-xl text-xs font-mono font-semibold text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/50 hover:border-cyan-600 transition-colors"
+              >
+                Customize
+              </button>
+            )}
+
             {/* Admin Dashboard Trigger */}
             <button
               id="admin-dashboard-btn"

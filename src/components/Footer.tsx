@@ -44,14 +44,14 @@ export const Footer: React.FC<FooterProps> = ({ socials, onOpenAdmin, onOpenProj
 
             {/* Social pills */}
             <div className="flex flex-wrap gap-2 pt-2">
-              {socials.filter(s => s.enabled).slice(0, 6).map((soc) => (
+              {socials.filter(s => s.enabled).map((soc) => (
                 <a
                   key={soc.id}
                   href={soc.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 rounded-lg bg-slate-900 hover:bg-cyan-500/20 border border-slate-800 hover:border-cyan-500/40 text-slate-400 hover:text-cyan-300 flex items-center justify-center transition-colors"
-                  title={soc.name}
+                  title={`${soc.platform}: ${soc.handle}`}
                 >
                   <IconHelper name={soc.icon || soc.platform} className="w-4 h-4" />
                 </a>
@@ -112,7 +112,7 @@ export const Footer: React.FC<FooterProps> = ({ socials, onOpenAdmin, onOpenProj
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-[11px] text-slate-500 text-center sm:text-left">
-            © {new Date().getFullYear()} S • ENGR (Engr. Imran Khan). All rights reserved.
+            @2020 S • ENGR (Engr. Imran Khan). All rights reserved
           </div>
 
           <div className="flex items-center space-x-4">

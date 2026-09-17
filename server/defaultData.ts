@@ -10,9 +10,36 @@ export const defaultSiteData: FullSiteData = {
     heroSupporting: "Technology, Creative Design & Real-World Solutions — Built with Purpose.",
     heroDescription: "I combine Computer Science, IoT, creative design, digital marketing, and construction project experience to create practical solutions for people, businesses and organizations.",
     email: "contact.engrimran@gmail.com",
-    whatsapp: "+92 300 0000000",
-    location: "Hub / Karachi, Pakistan",
-    adminPasskey: "engr-imran-2025"
+    whatsapp: "03331244214",
+    location: "HUB Chowki Balochistan",
+    adminPasskey: "engr-imran-2025",
+    demoMode: true,
+    showPricing: true,
+    showServices: true,
+    showFeatures: true,
+    ctaTitle: "Need a Customized Website?",
+    ctaSupportingText: "Explore the demo or request a fully customized version built around your brand, services and business goals.",
+    upgradeMessage: "Explore this working live demo or upgrade to a fully tailored premium platform featuring custom branding, client dashboard, custom domain, and bespoke API integrations.",
+    premiumFeatures: {
+      customBranding: true,
+      customColors: true,
+      customTypography: true,
+      customSections: true,
+      advancedAnimations: true,
+      advancedPortfolioLayouts: true,
+      customServicePages: true,
+      advancedContactLeadSystem: true,
+      customerDashboard: true,
+      adminCMS: true,
+      advancedAnalytics: true,
+      customDomainSupport: true,
+      advancedSEO: true,
+      blogSystem: true,
+      bookingSystem: true,
+      clientPortal: true,
+      paymentIntegration: true,
+      customApiIntegrations: true
+    }
   },
   services: [
     {
@@ -605,13 +632,73 @@ export const defaultSiteData: FullSiteData = {
   ],
   socials: [
     {
+      id: "soc-whatsapp",
+      platform: "WhatsApp",
+      name: "Direct WhatsApp",
+      url: "https://wa.me/923331244214",
+      handle: "03331244214",
+      description: "Instant direct chat for rapid engineering project queries, IoT requirements, and milestones.",
+      icon: "whatsapp",
+      enabled: true
+    },
+    {
       id: "soc-fiverr",
       platform: "Fiverr",
       name: "Fiverr Marketplace",
-      url: "https://www.fiverr.com",
-      handle: "Available on Request / Custom Projects",
-      description: "Book custom web development, IoT prototypes, and creative services securely.",
-      icon: "Briefcase",
+      url: "https://www.fiverr.com/imran_khan1327",
+      handle: "@imran_khan1327",
+      description: "Book custom web development, IoT solutions, and design services via secure platform escrow.",
+      icon: "fiverr",
+      enabled: true
+    },
+    {
+      id: "soc-facebook",
+      platform: "Facebook",
+      name: "Facebook Page",
+      url: "https://www.facebook.com/profile.php?id=61586602392197",
+      handle: "Engr. Imran Khan Official",
+      description: "Community updates, training workshops, IoT experiments, and engineering tutorials.",
+      icon: "facebook",
+      enabled: true
+    },
+    {
+      id: "soc-instagram",
+      platform: "Instagram",
+      name: "Instagram Account",
+      url: "https://www.instagram.com/teachwithimran/?fbclid=IwY2xjawUY3OtwZG9mAWV4dG4DYWVtAjEwAGJyaWQRMWViR1pwaVBSZFk5TzFRcUdzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeAv9ABRKX-4RSnDZM4U6yVvGtXYP4IB6gWrxdbxPx_DWJOZh9qc9OuMAln-4_aem_DA-2uqN7atJgb2zdqpJRAQ",
+      handle: "@teachwithimran",
+      description: "Behind-the-scenes engineering builds, design prototypes, and educational reels.",
+      icon: "instagram",
+      enabled: true
+    },
+    {
+      id: "soc-linkedin",
+      platform: "LinkedIn",
+      name: "LinkedIn ID",
+      url: "https://www.linkedin.com/in/imran-khan-b7299833a/",
+      handle: "imran-khan-b7299833a",
+      description: "Connect for engineering partnerships, professional updates, and technical consulting.",
+      icon: "linkedin",
+      enabled: true
+    },
+    {
+      id: "soc-tiktok",
+      platform: "TikTok",
+      name: "TikTok Account",
+      url: "https://www.tiktok.com/@teachwithimran?_r=1&_t=ZS-97yZged8h9B&fbclid=IwY2xjawUY3FVwZG9mAWV4dG4DYWVtAjEwAGJyaWQRMWViR1pwaVBSZFk5TzFRcUdzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeB8UmAeVy_CWK7c5CUpW_o6Z77mkL-4RREzh8MRt1V16tH4u7fjpzvPxALto_aem_dXXpmci886GN_KWqPbqf7A",
+      handle: "@teachwithimran",
+      description: "Bite-sized technology demonstrations, IoT circuitry tips, and coding shorts.",
+      icon: "tiktok",
+      enabled: true
+    },
+    {
+      id: "soc-youtube",
+      platform: "YouTube",
+      name: "YouTube Channel",
+      url: "https://www.youtube.com/@TeachWithImran1",
+      handle: "@TeachWithImran1",
+      description: "Video tutorials on IoT, microcontrollers, programming, and tech education.",
+      icon: "youtube",
       enabled: true
     },
     {
@@ -621,27 +708,7 @@ export const defaultSiteData: FullSiteData = {
       url: "https://www.upwork.com",
       handle: "Engr. Imran Khan",
       description: "Hire for fixed-price contracts and long-term technical consulting projects.",
-      icon: "Globe",
-      enabled: true
-    },
-    {
-      id: "soc-linkedin",
-      platform: "LinkedIn",
-      name: "LinkedIn Professional",
-      url: "https://www.linkedin.com",
-      handle: "engr-imran-khan",
-      description: "Connect for professional updates, engineering articles, and collaboration.",
-      icon: "Linkedin",
-      enabled: true
-    },
-    {
-      id: "soc-whatsapp",
-      platform: "WhatsApp",
-      name: "Direct WhatsApp",
-      url: "https://wa.me/",
-      handle: "Direct Quick Inquiry",
-      description: "Instant direct chat for urgent project requirements and timelines.",
-      icon: "MessageCircle",
+      icon: "upwork",
       enabled: true
     },
     {
@@ -651,47 +718,7 @@ export const defaultSiteData: FullSiteData = {
       url: "mailto:contact.engrimran@gmail.com",
       handle: "contact.engrimran@gmail.com",
       description: "Send formal project briefs, RFP specifications, and official inquiries.",
-      icon: "Mail",
-      enabled: true
-    },
-    {
-      id: "soc-youtube",
-      platform: "YouTube",
-      name: "YouTube Channel",
-      url: "https://youtube.com",
-      handle: "Teach With Imran",
-      description: "Educational tutorials on IoT, programming fundamentals, and technology.",
-      icon: "Youtube",
-      enabled: true
-    },
-    {
-      id: "soc-facebook",
-      platform: "Facebook",
-      name: "Facebook Page",
-      url: "https://facebook.com",
-      handle: "S.ENGR.Official",
-      description: "Community updates, training workshops, and technological articles.",
-      icon: "Share2",
-      enabled: true
-    },
-    {
-      id: "soc-instagram",
-      platform: "Instagram",
-      name: "Instagram",
-      url: "https://instagram.com",
-      handle: "@engr.imrankhan",
-      description: "Behind-the-scenes engineering builds, design prototypes, and reels.",
-      icon: "Instagram",
-      enabled: true
-    },
-    {
-      id: "soc-tiktok",
-      platform: "TikTok",
-      name: "TikTok Tech",
-      url: "https://tiktok.com",
-      handle: "@engrimrankhan",
-      description: "Bite-sized technology demonstrations and smart circuit experiments.",
-      icon: "Video",
+      icon: "email",
       enabled: true
     }
   ],
@@ -743,5 +770,6 @@ export const defaultSiteData: FullSiteData = {
       createdAt: "2025-02-12T11:00:00.000Z",
       read: true
     }
-  ]
+  ],
+  customRequests: []
 };

@@ -126,6 +126,55 @@ export interface SocialPlatform {
   enabled: boolean;
 }
 
+export interface PremiumFeaturesConfig {
+  customBranding: boolean;
+  customColors: boolean;
+  customTypography: boolean;
+  customSections: boolean;
+  advancedAnimations: boolean;
+  advancedPortfolioLayouts: boolean;
+  customServicePages: boolean;
+  advancedContactLeadSystem: boolean;
+  customerDashboard: boolean;
+  adminCMS: boolean;
+  advancedAnalytics: boolean;
+  customDomainSupport: boolean;
+  advancedSEO: boolean;
+  blogSystem: boolean;
+  bookingSystem: boolean;
+  clientPortal: boolean;
+  paymentIntegration: boolean;
+  customApiIntegrations: boolean;
+}
+
+export type CustomRequestStatus = 
+  | 'NEW'
+  | 'REVIEWING'
+  | 'PROPOSAL_SENT'
+  | 'ACCEPTED'
+  | 'IN_DEVELOPMENT'
+  | 'DELIVERED'
+  | 'ARCHIVED';
+
+export interface CustomWebsiteRequest {
+  id: string;
+  fullName: string;
+  email: string;
+  whatsapp: string;
+  businessName: string;
+  websiteType: string;
+  requiredServices: string[];
+  designPreference: string;
+  requiredFeatures: string[];
+  budget: string;
+  deadline: string;
+  additionalRequirements: string;
+  status: CustomRequestStatus;
+  createdAt: string;
+  adminNotes?: string;
+  supabaseSynced?: boolean;
+}
+
 export interface SiteSettings {
   brandName: string;
   professionalName: string;
@@ -138,6 +187,18 @@ export interface SiteSettings {
   whatsapp: string;
   location: string;
   adminPasskey: string;
+
+  // Admin-controlled settings
+  demoMode: boolean; // Demo mode ON/OFF
+  showPricing: boolean; // Pricing visibility ON/OFF
+  showServices: boolean; // Service visibility ON/OFF
+  showFeatures: boolean; // Feature visibility ON/OFF
+  ctaTitle: string;
+  ctaSupportingText: string;
+  upgradeMessage: string;
+
+  // Modular premium features
+  premiumFeatures: PremiumFeaturesConfig;
 }
 
 export interface FullSiteData {
@@ -150,4 +211,5 @@ export interface FullSiteData {
   socials: SocialPlatform[];
   leads: Lead[];
   messages: ContactMessage[];
+  customRequests?: CustomWebsiteRequest[];
 }
