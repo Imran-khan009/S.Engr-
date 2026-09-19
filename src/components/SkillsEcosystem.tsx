@@ -39,7 +39,7 @@ export const SkillsEcosystem: React.FC<SkillsEcosystemProps> = ({
             SKILLS ECOSYSTEM
           </h2>
           <p className="text-sm sm:text-base text-slate-400">
-            A comprehensive matrix of verified technical competencies, software toolchains, and field capabilities without arbitrary percentage meters.
+            A comprehensive matrix of core technical competencies, software toolchains, and field capabilities without arbitrary percentage meters.
           </p>
         </div>
 

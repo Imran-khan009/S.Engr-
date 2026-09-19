@@ -85,7 +85,7 @@ export const AdminDemoSettingsTab: React.FC<AdminDemoSettingsTabProps> = ({
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={settings.demoMode ?? true}
+                checked={Boolean(settings.demoMode)}
                 onChange={(e) => onChangeSettings({ ...settings, demoMode: e.target.checked })}
                 className="sr-only peer"
               />

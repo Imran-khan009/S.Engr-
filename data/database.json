@@ -4,14 +4,13 @@
     "professionalName": "Engr. Imran Khan",
     "positioning": "Technology • IoT • Creative Design • Digital Marketing • Construction & Design • Teaching",
     "brandConcept": "Learn • Create • Build • Teach • Hire",
-    "heroHeading": "BUILD. DESIGN. TEACH. SOLVE.",
-    "heroSupporting": "Technology, Creative Design & Real-World Solutions — Built with Purpose.",
-    "heroDescription": "I combine Computer Science, IoT, creative design, digital marketing, and construction project experience to create practical solutions for people, businesses and organizations.",
+    "heroHeading": "Technology, Digital & Engineering Solutions",
+    "heroSupporting": "Websites, IoT systems, digital services, creative design and practical technology training.",
+    "heroDescription": "Practical technology and engineering execution combining Computer Science, IoT embedded systems, creative media, and technical instruction.",
     "email": "contact.engrimran@gmail.com",
     "whatsapp": "03331244214",
     "location": "HUB Chowki Balochistan",
-    "adminPasskey": "engr-imran-2025",
-    "demoMode": true,
+    "demoMode": false,
     "showPricing": true,
     "showServices": true,
     "showFeatures": true,
@@ -657,17 +656,22 @@
     {
       "id": "exp-iot-unicef",
       "role": "IoT Instructor",
-      "organization": "UNICEF-Supported Youth Skills Development Program",
+      "trade": "IoT",
+      "organization": "ALP Centre / Jamia Hussainia Naimia",
+      "supportingProgram": "UNICEF-supported program",
       "location": "Hub, Balochistan",
-      "dates": "2023 – Present",
+      "startDate": "07-Jun-2024",
+      "status": "Present",
+      "dates": "07-Jun-2024 – Present",
       "responsibilities": [
-        "Delivered hands-on training on microcontrollers (Arduino Uno, ESP32) and circuit fundamentals to aspiring students.",
+        "Delivered hands-on training on microcontrollers (Arduino Uno, ESP32) and circuit fundamentals in the UNICEF-supported ALP program.",
         "Guided students through real-world sensor integration (temperature, ultrasonic, soil moisture, motion detection).",
         "Mentored student capstone projects from component selection to breadboard assembly and functional C++ code.",
         "Emphasized practical problem-solving: connecting embedded hardware to solve local community challenges."
       ],
       "skills": [
         "IoT Systems",
+        "Trade: IoT",
         "Arduino",
         "ESP32",
         "C++ Embedded",
@@ -679,11 +683,15 @@
     {
       "id": "exp-comp-unicef",
       "role": "Computer Operator Instructor",
-      "organization": "UNICEF-Supported Program — GBHS Jam Yousaf Colony",
-      "location": "Hub, Balochistan",
-      "dates": "2022 – 2023",
+      "trade": "Computer Operator",
+      "organization": "GBHS Jam Yousaf Colony, District Hub",
+      "supportingProgram": "UNICEF / European Union supported program",
+      "location": "District Hub, Balochistan",
+      "startDate": "Apr-2025",
+      "status": "Present",
+      "dates": "Apr-2025 – Present",
       "responsibilities": [
-        "Conducted professional computing and digital literacy workshops for enrolled youth.",
+        "Conducted professional computing and digital literacy workshops for enrolled youth under the UNICEF / European Union supported program.",
         "Taught advanced Microsoft Office suites (Excel formulas, data entry, Word formatting, PowerPoint presentation).",
         "Instructed students on computer hardware diagnostics, operating system fundamentals, and internet safety.",
         "Prepared learners for practical employment and freelance digital workplace opportunities."
@@ -701,7 +709,7 @@
     {
       "id": "exp-construction-coord",
       "role": "Construction & Site Engineering Coordinator",
-      "organization": "Regional Civil & Infrastructure Projects",
+      "organization": "Regional Civil Infrastructure Works",
       "location": "Hub & Regional Sites",
       "dates": "2021 – 2024",
       "responsibilities": [
@@ -732,7 +740,7 @@
     {
       "id": "edu-diploma-civil",
       "degree": "Diploma of Associate Engineering (DAE) in Civil Engineering",
-      "institution": "Government Polytechnic Institute / Recognized Technical Board",
+      "institution": "Recognized Board of Technical Education [Institutional details verified upon request]",
       "dates": "Completed",
       "location": "Balochistan / Pakistan",
       "details": "Foundational training in surveying, 2D drafting, structural measurements, construction materials, building layouts, and site management practices."

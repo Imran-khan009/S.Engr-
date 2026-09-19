@@ -42,7 +42,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
             </h2>
           </div>
           <p className="mt-3 md:mt-0 text-sm text-slate-400 max-w-md font-mono">
-            Every project documented with real hardware schematics, system architecture, and verified problem-solving narratives.
+            Every project documented with practical hardware schematics, system architecture, and real-world execution narratives.
           </p>
         </div>
 
@@ -85,6 +85,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75 group-hover:opacity-90"
                       referrerPolicy="no-referrer"
                       loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-600 font-mono text-xs">
@@ -268,12 +269,12 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
                 </div>
               </div>
 
-              {/* Verified Status Note */}
+              {/* Case Study Note */}
               {selectedProject.verifiedNotes && (
                 <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center space-x-2 text-xs text-slate-400">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
-                    <strong className="text-slate-300">Verified Case Study:</strong> {selectedProject.verifiedNotes}
+                    <strong className="text-slate-300">Project Case Study:</strong> {selectedProject.verifiedNotes}
                   </span>
                 </div>
               )}

@@ -8,6 +8,19 @@ export type ServiceCategory =
   | 'Excel & Data Services'
   | 'Construction & Design';
 
+export type PricingModel = 
+  | 'Fixed Price'
+  | 'Starting From'
+  | 'Custom Quote'
+  | 'Contact for Quote'
+  | 'Hourly Rate'
+  | 'Milestone-based'
+  | 'fixed'
+  | 'starting_at'
+  | 'hourly'
+  | 'milestone'
+  | 'custom_quote';
+
 export interface Service {
   id: string;
   slug: string;
@@ -18,6 +31,8 @@ export interface Service {
   solution: string;
   includedFeatures: string[];
   tools: string[];
+  pricingType?: PricingModel;
+  pricingModel?: PricingModel | string;
   startingPrice: string; // editable in CMS, e.g. "$120" or "Custom Quote"
   estimatedDelivery: string; // editable in CMS, e.g. "3-5 Days"
   portfolioExamples: string[];
@@ -53,9 +68,13 @@ export interface Project {
 export interface ExperienceItem {
   id: string;
   role: string;
+  trade?: string;
   organization: string;
+  supportingProgram?: string;
   location: string;
   dates: string;
+  startDate?: string;
+  status?: string;
   responsibilities: string[];
   skills: string[];
   verified: boolean;
@@ -100,6 +119,9 @@ export interface Lead {
   preferredContactMethod: string;
   platformPreference: 'Direct' | 'Fiverr' | 'Upwork';
   fileName?: string;
+  fileUrl?: string;
+  fileSize?: string;
+  fileType?: string;
   status: LeadStatus;
   createdAt: string;
   adminNotes?: string;
@@ -201,6 +223,105 @@ export interface SiteSettings {
   premiumFeatures: PremiumFeaturesConfig;
 }
 
+export type TeachingRequestStatus = 
+  | 'NEW'
+  | 'REVIEWING'
+  | 'QUOTED'
+  | 'PAYMENT PENDING'
+  | 'PAID'
+  | 'IN PROGRESS'
+  | 'DELIVERED'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
+export interface TeachingSubOffering {
+  title: string;
+  description: string;
+}
+
+export interface TeachingService {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  subtitle: string;
+  shortDescription: string;
+  description: string;
+  whoIsThisFor: string[];
+  subOfferings: TeachingSubOffering[];
+  whatIsIncluded: string[];
+  deliverables: string[];
+  samplePreview: {
+    title: string;
+    excerpt: string;
+    notice: string;
+  };
+  process: string[];
+  faqs: { question: string; answer: string }[];
+  pricingType: 'starting_at' | 'fixed' | 'custom_quote';
+  startingPrice: string; // e.g. "$45" or "Custom Quote"
+  premiumPrice?: string; // optional premium tier, e.g. "$95"
+  deliveryTime: string; // e.g. "2-3 Days"
+  icon: string; // Icon name e.g. "BookOpen", "Wrench", "Layers", "FileCheck", "Users"
+  enabled: boolean;
+  order: number;
+}
+
+export interface TeachingServiceRequest {
+  id: string;
+  fullName: string;
+  email: string;
+  whatsapp: string;
+  country: string;
+  userRole: 'Teacher' | 'Student' | 'Instructor' | 'Institute' | 'Other';
+  subject: string;
+  studentLevel: string; // e.g. "Beginners (Grades 6-8)", "Intermediate", "Vocational"
+  topic: string;
+  courseOrModule: string;
+  requiredServiceId: string;
+  requiredServiceName: string;
+  numberOfLessons: string;
+  requiredFormat: string; // "PDF Document" | "Editable Word / Google Docs" | "PowerPoint Presentation" | "Print-Ready Sheets" | "Custom"
+  deadline: string;
+  budget: string;
+  additionalRequirements: string;
+  isCustomRequest?: boolean;
+  fileAttachment?: {
+    fileName: string;
+    fileSize?: string;
+    fileType?: string;
+    fileUrl?: string;
+    storagePath?: string;
+    dataUrl?: string; // backwards compatibility fallback
+  };
+  status: TeachingRequestStatus;
+  createdAt: string;
+  adminNotes?: string;
+  supabaseSynced?: boolean;
+}
+
+export interface TeachingConsultationSettings {
+  title: string;
+  headline: string;
+  subtext: string;
+  price: string; // e.g. "$35"
+  duration: string; // e.g. "45 min"
+  topics: string[];
+  enabled: boolean;
+}
+
+export interface TeachingDigitalProduct {
+  id: string;
+  title: string;
+  category: 'Lesson Plan Templates' | 'Teaching Templates' | 'Worksheets' | 'Assessment Packs' | 'Course Planning Templates' | 'Instructor Resources';
+  description: string;
+  deliverableFormat: string;
+  price: string;
+  previewPoints: string[];
+  isPaid: boolean;
+  status: 'active' | 'coming_soon';
+}
+
 export interface FullSiteData {
   settings: SiteSettings;
   services: Service[];
@@ -212,4 +333,9 @@ export interface FullSiteData {
   leads: Lead[];
   messages: ContactMessage[];
   customRequests?: CustomWebsiteRequest[];
+  teachingServices?: TeachingService[];
+  teachingRequests?: TeachingServiceRequest[];
+  teachingConsultation?: TeachingConsultationSettings;
+  teachingProducts?: TeachingDigitalProduct[];
 }
+

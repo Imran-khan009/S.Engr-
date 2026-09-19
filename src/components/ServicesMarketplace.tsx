@@ -161,7 +161,17 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
                 <div className="flex items-center justify-between mb-5 bg-slate-950/60 px-3.5 py-2.5 rounded-xl border border-slate-800/60">
                   <div>
                     <span className="text-[10px] uppercase font-mono text-slate-400 block">
-                      {showPricing ? 'Starting Price' : 'Pricing Structure'}
+                      {showPricing
+                        ? (service.pricingModel === 'fixed'
+                            ? 'Fixed Price'
+                            : service.pricingModel === 'hourly'
+                            ? 'Hourly Rate'
+                            : service.pricingModel === 'milestone'
+                            ? 'Milestone-based'
+                            : service.pricingModel === 'custom_quote'
+                            ? 'Custom Quote'
+                            : 'Starting At')
+                        : 'Pricing Structure'}
                     </span>
                     <span className="text-sm font-bold text-white font-mono flex items-center text-cyan-300">
                       {showPricing ? service.startingPrice : 'Custom Quote'}

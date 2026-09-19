@@ -15,13 +15,13 @@ export const FreelanceHub: React.FC<FreelanceHubProps> = ({ socials }) => {
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-800/40 text-cyan-400 font-mono text-xs uppercase tracking-wider mb-3">
             <Globe className="w-3.5 h-3.5" />
-            <span>Verified Digital Presence</span>
+            <span>Official Digital Presence</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 uppercase">
             FIND ME ONLINE
           </h2>
           <p className="text-sm sm:text-base text-slate-400">
-            Connect across verified freelance marketplaces, social channels, and direct inquiry touchpoints.
+            Connect across official freelance marketplaces, social channels, and direct inquiry touchpoints.
           </p>
         </div>
 

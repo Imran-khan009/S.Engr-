@@ -52,7 +52,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
       name: "Fiverr Marketplace",
       url: "https://www.fiverr.com/imran_khan1327",
       handle: "@imran_khan1327",
-      description: "Book verified web development, IoT solutions, and design services.",
+      description: "Book professional web development, IoT solutions, and design services.",
       icon: "fiverr",
       enabled: true
     },
@@ -408,7 +408,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
             <div>
               <div className="flex items-center space-x-2 text-cyan-400 font-mono text-xs uppercase tracking-wider mb-1">
                 <Globe className="w-3.5 h-3.5" />
-                <span>Verified Social Accounts & Marketplaces</span>
+                <span>Official Accounts & Marketplaces</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-white uppercase tracking-tight">
                 Connect on My Social & Professional Networks

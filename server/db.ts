@@ -1,6 +1,20 @@
 import fs from 'fs';
 import path from 'path';
-import { FullSiteData, Lead, ContactMessage, Service, Project, SiteSettings, CustomWebsiteRequest, CustomRequestStatus } from '../src/types';
+import {
+  FullSiteData,
+  Lead,
+  ContactMessage,
+  Service,
+  Project,
+  SiteSettings,
+  CustomWebsiteRequest,
+  CustomRequestStatus,
+  TeachingService,
+  TeachingServiceRequest,
+  TeachingRequestStatus,
+  TeachingConsultationSettings,
+  TeachingDigitalProduct
+} from '../src/types';
 import { defaultSiteData } from './defaultData';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -41,7 +55,11 @@ export function initDatabase(): FullSiteData {
       socials: parsed.socials?.length ? parsed.socials : defaultSiteData.socials,
       leads: parsed.leads || [],
       messages: parsed.messages || [],
-      customRequests: parsed.customRequests || []
+      customRequests: parsed.customRequests || [],
+      teachingServices: parsed.teachingServices && parsed.teachingServices.length > 0 ? parsed.teachingServices : defaultSiteData.teachingServices,
+      teachingRequests: parsed.teachingRequests || defaultSiteData.teachingRequests || [],
+      teachingConsultation: parsed.teachingConsultation || defaultSiteData.teachingConsultation,
+      teachingProducts: parsed.teachingProducts && parsed.teachingProducts.length > 0 ? parsed.teachingProducts : defaultSiteData.teachingProducts
     };
 
     return merged;
@@ -197,7 +215,87 @@ export function deleteCustomWebsiteRequest(id: string): boolean {
   return false;
 }
 
+// --- Teaching Services & Requests Handlers ---
+
+export function addTeachingRequest(
+  req: Omit<TeachingServiceRequest, 'id' | 'createdAt' | 'status'> & { status?: TeachingRequestStatus }
+): TeachingServiceRequest {
+  const db = getDatabase();
+  if (!db.teachingRequests) db.teachingRequests = [];
+  const newRequest: TeachingServiceRequest = {
+    ...req,
+    id: `treq-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    status: req.status || 'NEW',
+    createdAt: new Date().toISOString()
+  };
+  db.teachingRequests.unshift(newRequest);
+  saveDatabase(db);
+  return newRequest;
+}
+
+export function updateTeachingRequestStatus(
+  id: string,
+  status: TeachingRequestStatus,
+  adminNotes?: string
+): TeachingServiceRequest | null {
+  const db = getDatabase();
+  if (!db.teachingRequests) db.teachingRequests = [];
+  const index = db.teachingRequests.findIndex(r => r.id === id);
+  if (index === -1) return null;
+  db.teachingRequests[index].status = status;
+  if (adminNotes !== undefined) {
+    db.teachingRequests[index].adminNotes = adminNotes;
+  }
+  saveDatabase(db);
+  return db.teachingRequests[index];
+}
+
+export function deleteTeachingRequest(id: string): boolean {
+  const db = getDatabase();
+  if (!db.teachingRequests) return false;
+  const initialLen = db.teachingRequests.length;
+  db.teachingRequests = db.teachingRequests.filter(r => r.id !== id);
+  if (db.teachingRequests.length !== initialLen) {
+    saveDatabase(db);
+    return true;
+  }
+  return false;
+}
+
+export function saveTeachingService(service: TeachingService): TeachingService {
+  const db = getDatabase();
+  if (!db.teachingServices) db.teachingServices = [];
+  const idx = db.teachingServices.findIndex(s => s.id === service.id);
+  if (idx !== -1) {
+    db.teachingServices[idx] = service;
+  } else {
+    db.teachingServices.push(service);
+  }
+  saveDatabase(db);
+  return service;
+}
+
+export function deleteTeachingService(id: string): boolean {
+  const db = getDatabase();
+  if (!db.teachingServices) return false;
+  const initialLen = db.teachingServices.length;
+  db.teachingServices = db.teachingServices.filter(s => s.id !== id);
+  if (db.teachingServices.length !== initialLen) {
+    saveDatabase(db);
+    return true;
+  }
+  return false;
+}
+
+export function updateTeachingConsultation(settings: TeachingConsultationSettings): TeachingConsultationSettings {
+  const db = getDatabase();
+  db.teachingConsultation = settings;
+  saveDatabase(db);
+  return db.teachingConsultation;
+}
+
 export function resetToDefaults(): FullSiteData {
   saveDatabase(defaultSiteData);
   return defaultSiteData;
 }
+

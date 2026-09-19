@@ -19,14 +19,14 @@ export const DemoComparisonModal: React.FC<DemoComparisonModalProps> = ({
 
   const demoFeatures = [
     { title: "Homepage & Hero Narrative", desc: "Interactive identity pipeline, headline showcase and quick actions." },
-    { title: "About Section & Verified Story", desc: "Professional background in CS, Civil Engineering, and tech execution." },
+    { title: "About Section & Professional Story", desc: "Background in CS, Civil Engineering, and tech execution." },
     { title: "Services Marketplace (11 Services)", desc: "Transparent problem/solution statements and CMS starting prices." },
     { title: "Portfolio & Live Circuit Simulators", desc: "Interactive soil moisture & ultrasonic water tank telemetry widgets." },
-    { title: "Verified Skills Matrix", desc: "Categorized competencies across Tech, IoT, Creative, Ads & Civil." },
+    { title: "Professional Skills Matrix", desc: "Categorized competencies across Tech, IoT, Creative, Ads & Civil." },
     { title: "Career & Education Timeline", desc: "Lasbela University BSCS & civil diploma academic milestones." },
     { title: "UNICEF Tech Pedagogy Highlight", desc: "Youth training program overview and 5-step learning pedagogy." },
     { title: "Direct Project Submission System", desc: "Multi-step client inquiry form with platform routing (Direct/Fiverr/Upwork)." },
-    { title: "Social & Freelance Links Hub", desc: "9 verified online profiles with CMS-managed destinations." },
+    { title: "Social & Freelance Links Hub", desc: "9 official online profiles with CMS-managed destinations." },
     { title: "Responsive Layout & Motion", desc: "Mobile-first navigation, fluid desktop layout and dark tech styling." }
   ];
 
@@ -111,7 +111,7 @@ export const DemoComparisonModal: React.FC<DemoComparisonModalProps> = ({
               </div>
 
               <p className="text-xs text-slate-400 leading-relaxed">
-                Full-featured showcase to evaluate engineering capabilities, verified credentials, and interactive systems.
+                Full-featured showcase to evaluate engineering capabilities, professional qualifications, and interactive systems.
               </p>
 
               <div className="space-y-2.5 pt-2">

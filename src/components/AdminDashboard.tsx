@@ -8,7 +8,11 @@ import {
   SocialPlatform,
   CustomWebsiteRequest,
   CustomRequestStatus,
-  SiteSettings
+  SiteSettings,
+  TeachingServiceRequest,
+  TeachingRequestStatus,
+  TeachingService,
+  TeachingConsultationSettings
 } from '../types';
 import {
   X,
@@ -26,10 +30,16 @@ import {
   ChevronRight,
   AlertCircle,
   Rocket,
-  Sliders
+  Sliders,
+  GraduationCap,
+  KeyRound,
+  Mail,
+  FileText
 } from 'lucide-react';
 import { AdminCustomRequestsTab } from './AdminCustomRequestsTab';
 import { AdminDemoSettingsTab } from './AdminDemoSettingsTab';
+import { AdminTeachingTab } from './AdminTeachingTab';
+import { getSupabaseClient } from '../lib/supabase';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -46,11 +56,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const [authMode, setAuthMode] = useState<'passkey' | 'supabase'>('passkey');
   const [passkey, setPasskey] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [token, setToken] = useState<string | null>(localStorage.getItem('admin_token'));
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    'leads' | 'customRequests' | 'services' | 'socials' | 'demoSettings' | 'settings'
+    'leads' | 'customRequests' | 'teaching' | 'services' | 'socials' | 'demoSettings' | 'settings'
   >('leads');
 
   // Leads state
@@ -59,6 +73,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Custom Website Requests state
   const [customRequests, setCustomRequests] = useState<CustomWebsiteRequest[]>(siteData?.customRequests || []);
+
+  // Teaching Services & Requests state
+  const [teachingRequests, setTeachingRequests] = useState<TeachingServiceRequest[]>(siteData?.teachingRequests || []);
+  const [teachingServices, setTeachingServices] = useState<TeachingService[]>(siteData?.teachingServices || []);
+  const [teachingConsultation, setTeachingConsultation] = useState<TeachingConsultationSettings | undefined>(siteData?.teachingConsultation);
 
   // Services editable copy
   const [services, setServices] = useState<Service[]>(siteData?.services || []);
@@ -78,11 +97,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       heroHeading: 'BUILD. DESIGN. TEACH. SOLVE.',
       heroSupporting: 'Technology, Creative Design & Real-World Solutions — Built with Purpose.',
       heroDescription: 'Computer systems engineer, technical instructor, IoT developer, and creative design strategist.',
-      adminPasskey: 'engr-imran-2025',
+      adminPasskey: '',
       email: 'contact.engrimran@gmail.com',
       whatsapp: '03331244214',
       location: 'HUB Chowki Balochistan',
-      demoMode: true,
+      demoMode: false,
       showPricing: true,
       showServices: true,
       showFeatures: true,
@@ -119,6 +138,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (siteData) {
       setLeads(siteData.leads || []);
       setCustomRequests(siteData.customRequests || []);
+      setTeachingRequests(siteData.teachingRequests || []);
+      setTeachingServices(siteData.teachingServices || []);
+      setTeachingConsultation(siteData.teachingConsultation);
       setServices(siteData.services || []);
       setSocials(siteData.socials || []);
       if (siteData.settings) {
@@ -151,6 +173,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       const data = await res.json();
       if (data.leads) setLeads(data.leads);
       if (data.customRequests) setCustomRequests(data.customRequests);
+      if (data.teachingRequests) setTeachingRequests(data.teachingRequests);
+      if (data.teachingServices) setTeachingServices(data.teachingServices);
+      if (data.teachingConsultation) setTeachingConsultation(data.teachingConsultation);
       if (data.services) setServices(data.services);
       if (data.socials) setSocials(data.socials);
       if (data.settings) setSettings(data.settings);
@@ -168,26 +193,82 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    setIsAuthenticating(true);
+
     try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ passkey })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Authentication failed');
-      setToken(data.token);
-      localStorage.setItem('admin_token', data.token);
-      showNotification('Admin login successful.');
-      fetchAdminData(data.token);
+      if (authMode === 'supabase') {
+        const supabase = getSupabaseClient();
+        if (!supabase) {
+          throw new Error('Supabase client is not configured. Please add SUPABASE_URL and SUPABASE_ANON_KEY, or sign in using your Admin Passkey.');
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error || !data.session) {
+          throw new Error(error?.message || 'Supabase authentication failed');
+        }
+
+        // Verify the Supabase token with the server session engine
+        const res = await fetch('/api/admin/verify-supabase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: data.session.access_token })
+        });
+
+        const sData = await res.json();
+        if (!res.ok) throw new Error(sData.error || 'Server validation failed');
+
+        setToken(sData.token);
+        localStorage.setItem('admin_token', sData.token);
+        showNotification('Supabase admin authentication verified.');
+        fetchAdminData(sData.token);
+      } else {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ passkey })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Authentication failed');
+        setToken(data.token);
+        localStorage.setItem('admin_token', data.token);
+        showNotification('Admin login successful.');
+        fetchAdminData(data.token);
+      }
     } catch (err: any) {
-      setAuthError(err.message || 'Invalid passkey.');
+      setAuthError(err.message || 'Authentication failed.');
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (token) {
+      try {
+        await fetch('/api/admin/logout', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.warn('Logout notification notice:', err);
+      }
+    }
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      try {
+        await supabase.auth.signOut();
+      } catch (err) {
+        console.warn('Supabase signout notice:', err);
+      }
+    }
+
     setToken(null);
     localStorage.removeItem('admin_token');
+    showNotification('Logged out successfully.');
   };
 
   const handleStatusChange = async (leadId: string, newStatus: LeadStatus) => {
@@ -308,6 +389,115 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  // --- Teaching Admin Handlers ---
+  const handleTeachingRequestStatus = async (
+    id: string,
+    status: TeachingRequestStatus,
+    adminNotes?: string
+  ) => {
+    try {
+      const res = await fetch('/api/admin/teaching-requests/status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ id, status, adminNotes })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update teaching request status');
+      setTeachingRequests(prev =>
+        prev.map(r => (r.id === id ? { ...r, status, adminNotes } : r))
+      );
+      showNotification(`Teaching request status updated to ${status}`);
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  const handleDeleteTeachingRequest = async (id: string) => {
+    if (!window.confirm('Delete this educational request record?')) return;
+    try {
+      const res = await fetch(`/api/admin/teaching-requests/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete teaching request');
+      setTeachingRequests(prev => prev.filter(r => r.id !== id));
+      showNotification('Educational request record removed.');
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  const handleSaveTeachingService = async (service: TeachingService) => {
+    try {
+      const res = await fetch('/api/admin/teaching-services', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(service)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save teaching service');
+      setTeachingServices(prev => {
+        const idx = prev.findIndex(s => s.id === service.id);
+        if (idx >= 0) {
+          const updated = [...prev];
+          updated[idx] = data.service;
+          return updated;
+        }
+        return [...prev, data.service];
+      });
+      showNotification(`Teaching service "${service.title}" saved successfully!`);
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  const handleDeleteTeachingService = async (id: string) => {
+    if (!window.confirm('Delete this teaching service?')) return;
+    try {
+      const res = await fetch(`/api/admin/teaching-services/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete teaching service');
+      setTeachingServices(prev => prev.filter(s => s.id !== id));
+      showNotification('Teaching service removed.');
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  const handleSaveConsultationSettings = async (settingsToSave: TeachingConsultationSettings) => {
+    try {
+      const res = await fetch('/api/admin/teaching-consultation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(settingsToSave)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update consultation settings');
+      setTeachingConsultation(data.consultation);
+      showNotification('Teaching consultation settings updated!');
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
   const handleSaveSettings = async () => {
     try {
       const res = await fetch('/api/admin/settings', {
@@ -325,6 +515,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       await onRefreshData();
     } catch (err: any) {
       showNotification(err.message, 'error');
+    }
+  };
+
+  const [isSyncingSupabase, setIsSyncingSupabase] = useState(false);
+
+  const handleSyncSupabase = async () => {
+    setIsSyncingSupabase(true);
+    try {
+      const res = await fetch('/api/admin/sync-supabase', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to sync with Supabase');
+      showNotification('All platform records and tables synchronized with Supabase PostgreSQL!');
+      await onRefreshData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    } finally {
+      setIsSyncingSupabase(false);
     }
   };
 
@@ -423,33 +633,95 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               Administrator Authentication
             </h3>
             <p className="text-xs text-slate-400 mb-6 font-mono leading-relaxed">
-              Enter your master passkey to access project inquiries, lead statuses, service pricing, and site CMS.
+              Secure authentication with Supabase PostgreSQL Auth or Server Admin Passkey.
             </p>
+
+            {/* Auth Mode Toggle */}
+            <div className="flex rounded-xl bg-slate-950 p-1 border border-slate-800 mb-5">
+              <button
+                type="button"
+                onClick={() => { setAuthMode('supabase'); setAuthError(null); }}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center justify-center space-x-1.5 transition-colors ${
+                  authMode === 'supabase'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Mail className="w-3.5 h-3.5" />
+                <span>Supabase Auth</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAuthMode('passkey'); setAuthError(null); }}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center justify-center space-x-1.5 transition-colors ${
+                  authMode === 'passkey'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                <span>Admin Passkey</span>
+              </button>
+            </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
               {authError && (
-                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800 text-xs text-rose-300">
+                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800 text-xs text-rose-300 text-left">
                   {authError}
                 </div>
               )}
-              <input
-                type="password"
-                required
-                value={passkey}
-                onChange={(e) => setPasskey(e.target.value)}
-                placeholder="Enter passkey (e.g. engr-imran-2025)"
-                className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white text-center focus:outline-none focus:border-cyan-500 font-mono"
-              />
+
+              {authMode === 'supabase' ? (
+                <div className="space-y-3 text-left">
+                  <div>
+                    <label className="block text-[11px] font-mono text-slate-400 mb-1">Admin Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="admin@example.com"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-mono text-slate-400 mb-1">Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="password"
+                    required
+                    value={passkey}
+                    onChange={(e) => setPasskey(e.target.value)}
+                    placeholder="Enter admin passkey"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white text-center focus:outline-none focus:border-cyan-500 font-mono"
+                  />
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 transition-all shadow-md shadow-cyan-500/20"
+                disabled={isAuthenticating}
+                className="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 transition-all shadow-md shadow-cyan-500/20 disabled:opacity-50"
               >
-                UNLOCK ADMIN PANEL
+                {isAuthenticating ? 'AUTHENTICATING...' : 'UNLOCK ADMIN PANEL'}
               </button>
             </form>
-            <p className="mt-4 text-[10px] font-mono text-slate-500">
-              Default system passkey: <code className="text-cyan-400">engr-imran-2025</code>
-            </p>
+
+            <div className="mt-4 flex items-center justify-center space-x-1.5 text-[11px] font-mono text-slate-500">
+              <Shield className="w-3 h-3 text-cyan-400" />
+              <span>Protected by brute-force rate limits & 24hr session expiry</span>
+            </div>
           </div>
         ) : (
           <div className="flex-1 flex flex-col overflow-hidden">
@@ -472,6 +744,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               >
                 <Rocket className="w-3.5 h-3.5" />
                 <span>Custom Requests ({customRequests.length})</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('teaching')}
+                className={`py-2 px-3 text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 whitespace-nowrap ${
+                  activeTab === 'teaching' ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <GraduationCap className="w-3.5 h-3.5" />
+                <span>Teaching & Education ({teachingRequests.length})</span>
               </button>
               <button
                 onClick={() => setActiveTab('services')}
@@ -609,6 +890,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <p className="text-slate-400">{lead.referenceRequirements}</p>
                             </div>
                           )}
+                          {(lead.fileUrl || lead.fileName) && (
+                            <div className="flex items-center space-x-2 pt-2 border-t border-slate-800/60 font-mono text-[11px] text-cyan-400">
+                              <FileText className="w-3.5 h-3.5 shrink-0" />
+                              <span>Attached: {lead.fileName || 'Project Specification'} {lead.fileSize && `(${lead.fileSize})`}</span>
+                              {lead.fileUrl && (
+                                <a
+                                  href={lead.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download={lead.fileName}
+                                  className="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800 text-[10px] text-cyan-300 hover:text-white"
+                                >
+                                  View / Download
+                                </a>
+                              )}
+                            </div>
+                          )}
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-800 font-mono text-[11px]">
                             <div>
                               <span className="text-slate-500">Budget:</span> <span className="text-white">{lead.budget}</span>
@@ -675,23 +973,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                           <label className="block text-xs font-mono text-cyan-400 mb-1">
-                            Starting Price (Editable CMS) *
+                            Pricing Model *
+                          </label>
+                          <select
+                            value={selectedService.pricingModel || 'starting_at'}
+                            onChange={(e) => setSelectedService({
+                              ...selectedService,
+                              pricingModel: e.target.value as any
+                            })}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
+                          >
+                            <option value="starting_at">Starting At (from $X)</option>
+                            <option value="fixed">Fixed Price</option>
+                            <option value="hourly">Hourly Rate ($/hr)</option>
+                            <option value="milestone">Milestone-based</option>
+                            <option value="custom_quote">Custom Quote Only</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-mono text-cyan-400 mb-1">
+                            Price / Rate (CMS) *
                           </label>
                           <input
                             type="text"
                             value={selectedService.startingPrice}
                             onChange={(e) => setSelectedService({ ...selectedService, startingPrice: e.target.value })}
-                            placeholder="e.g. $120 or Custom Quote"
+                            placeholder="e.g. $120 or $35/hr"
                             className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
                           />
                         </div>
 
                         <div>
                           <label className="block text-xs font-mono text-cyan-400 mb-1">
-                            Estimated Delivery (Editable CMS) *
+                            Estimated Delivery *
                           </label>
                           <input
                             type="text"
@@ -845,6 +1163,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               />
             )}
 
+            {/* Tab: Teaching & Education Services Management */}
+            {activeTab === 'teaching' && (
+              <AdminTeachingTab
+                requests={teachingRequests}
+                services={teachingServices}
+                consultation={teachingConsultation}
+                onUpdateTeachingRequestStatus={handleTeachingRequestStatus}
+                onDeleteTeachingRequest={handleDeleteTeachingRequest}
+                onSaveTeachingService={handleSaveTeachingService}
+                onDeleteTeachingService={handleDeleteTeachingService}
+                onSaveConsultationSettings={handleSaveConsultationSettings}
+              />
+            )}
+
             {/* Tab: Demo Mode & Premium Controls */}
             {activeTab === 'demoSettings' && (
               <AdminDemoSettingsTab
@@ -864,6 +1196,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <p className="text-xs text-slate-400 font-mono leading-relaxed mb-6">
                     Manage system database state and reset to default verified seed data if needed.
                   </p>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-cyan-950/20 border border-cyan-800/40 space-y-3">
+                  <h4 className="text-xs font-mono font-bold text-cyan-400 uppercase flex items-center space-x-2">
+                    <RefreshCw className={`w-3.5 h-3.5 ${isSyncingSupabase ? 'animate-spin' : ''}`} />
+                    <span>Supabase PostgreSQL Synchronization</span>
+                  </h4>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Migrate and sync all services, projects, settings, custom requests, and educational requests into Supabase PostgreSQL tables.
+                  </p>
+                  <button
+                    onClick={handleSyncSupabase}
+                    disabled={isSyncingSupabase}
+                    className="px-4 py-2 rounded-xl text-xs font-bold font-mono uppercase bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    {isSyncingSupabase ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>SYNCHRONIZING...</span>
+                      </>
+                    ) : (
+                      <span>SYNC ALL TO SUPABASE POSTGRESQL</span>
+                    )}
+                  </button>
                 </div>
 
                 <div className="p-5 rounded-2xl bg-rose-950/20 border border-rose-900/40 space-y-3">

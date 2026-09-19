@@ -6,14 +6,14 @@ export const defaultSiteData: FullSiteData = {
     professionalName: "Engr. Imran Khan",
     positioning: "Technology • IoT • Creative Design • Digital Marketing • Construction & Design • Teaching",
     brandConcept: "Learn • Create • Build • Teach • Hire",
-    heroHeading: "BUILD. DESIGN. TEACH. SOLVE.",
-    heroSupporting: "Technology, Creative Design & Real-World Solutions — Built with Purpose.",
-    heroDescription: "I combine Computer Science, IoT, creative design, digital marketing, and construction project experience to create practical solutions for people, businesses and organizations.",
+    heroHeading: "Technology, Digital & Engineering Solutions",
+    heroSupporting: "Websites, IoT systems, digital services, creative design and practical technology training.",
+    heroDescription: "Practical technology and engineering execution combining Computer Science, IoT embedded systems, creative media, and technical instruction.",
     email: "contact.engrimran@gmail.com",
     whatsapp: "03331244214",
     location: "HUB Chowki Balochistan",
-    adminPasskey: "engr-imran-2025",
-    demoMode: true,
+    adminPasskey: "",
+    demoMode: false,
     showPricing: true,
     showServices: true,
     showFeatures: true,
@@ -495,26 +495,34 @@ export const defaultSiteData: FullSiteData = {
     {
       id: "exp-iot-unicef",
       role: "IoT Instructor",
-      organization: "UNICEF-Supported Youth Skills Development Program",
+      trade: "IoT",
+      organization: "ALP Centre / Jamia Hussainia Naimia",
+      supportingProgram: "UNICEF-supported program",
       location: "Hub, Balochistan",
-      dates: "2023 – Present",
+      startDate: "07-Jun-2024",
+      status: "Present",
+      dates: "07-Jun-2024 – Present",
       responsibilities: [
-        "Delivered hands-on training on microcontrollers (Arduino Uno, ESP32) and circuit fundamentals to aspiring students.",
+        "Delivered hands-on training on microcontrollers (Arduino Uno, ESP32) and circuit fundamentals in the UNICEF-supported ALP program.",
         "Guided students through real-world sensor integration (temperature, ultrasonic, soil moisture, motion detection).",
         "Mentored student capstone projects from component selection to breadboard assembly and functional C++ code.",
         "Emphasized practical problem-solving: connecting embedded hardware to solve local community challenges."
       ],
-      skills: ["IoT Systems", "Arduino", "ESP32", "C++ Embedded", "Hands-on Pedagogy", "Circuit Prototyping"],
+      skills: ["IoT Systems", "Trade: IoT", "Arduino", "ESP32", "C++ Embedded", "Hands-on Pedagogy", "Circuit Prototyping"],
       verified: true
     },
     {
       id: "exp-comp-unicef",
       role: "Computer Operator Instructor",
-      organization: "UNICEF-Supported Program — GBHS Jam Yousaf Colony",
-      location: "Hub, Balochistan",
-      dates: "2022 – 2023",
+      trade: "Computer Operator",
+      organization: "GBHS Jam Yousaf Colony, District Hub",
+      supportingProgram: "UNICEF / European Union supported program",
+      location: "District Hub, Balochistan",
+      startDate: "Apr-2025",
+      status: "Present",
+      dates: "Apr-2025 – Present",
       responsibilities: [
-        "Conducted professional computing and digital literacy workshops for enrolled youth.",
+        "Conducted professional computing and digital literacy workshops for enrolled youth under the UNICEF / European Union supported program.",
         "Taught advanced Microsoft Office suites (Excel formulas, data entry, Word formatting, PowerPoint presentation).",
         "Instructed students on computer hardware diagnostics, operating system fundamentals, and internet safety.",
         "Prepared learners for practical employment and freelance digital workplace opportunities."
@@ -525,7 +533,7 @@ export const defaultSiteData: FullSiteData = {
     {
       id: "exp-construction-coord",
       role: "Construction & Site Engineering Coordinator",
-      organization: "Regional Civil & Infrastructure Projects",
+      organization: "Regional Civil Infrastructure Works",
       location: "Hub & Regional Sites",
       dates: "2021 – 2024",
       responsibilities: [
@@ -550,7 +558,7 @@ export const defaultSiteData: FullSiteData = {
     {
       id: "edu-diploma-civil",
       degree: "Diploma of Associate Engineering (DAE) in Civil Engineering",
-      institution: "Government Polytechnic Institute / Recognized Technical Board",
+      institution: "Recognized Board of Technical Education [Institutional details verified upon request]",
       dates: "Completed",
       location: "Balochistan / Pakistan",
       details: "Foundational training in surveying, 2D drafting, structural measurements, construction materials, building layouts, and site management practices."
@@ -771,5 +779,430 @@ export const defaultSiteData: FullSiteData = {
       read: true
     }
   ],
-  customRequests: []
+  customRequests: [],
+  teachingServices: [
+    {
+      id: "ts-lesson-plans",
+      slug: "lesson-plan-development",
+      title: "Lesson Plan Development",
+      category: "Instructional Design",
+      subtitle: "Structured, activity-rich, and outcome-oriented lesson frameworks for STEM, vocational, and technical subjects.",
+      shortDescription: "Custom daily, weekly, and modular lesson plans engineered with clear instructional objectives, time allocations, hands-on tasks, and formative check-ins.",
+      description: "Teaching technical or foundational concepts requires more than speaking from slides. Our Lesson Plan Development service supplies structured blueprints that map each minute of instructional time to concrete cognitive outcomes. Every plan integrates contextual real-world examples, interactive engagement intervals, and diagnostic checkpoints to ensure high retention without student fatigue.",
+      whoIsThisFor: [
+        "School, college, and vocational STEM teachers seeking structured, accredited lesson flow",
+        "Technical instructors transitioning from industry into formal classroom or lab teaching",
+        "Training institutes needing standardized, repeatable lesson delivery blueprints",
+        "Tutors and educators preparing beginner students for technical examinations"
+      ],
+      subOfferings: [
+        { title: "Daily Lesson Plans", description: "Period-by-period instructional breakdowns including warm-up hook, concept delivery, guided practice, and closure." },
+        { title: "Weekly Lesson Plans", description: "Five-to-six day progressive instructional sequences ensuring continuous concept reinforcement and milestone pacing." },
+        { title: "Module-wise Lesson Plans", description: "Comprehensive multi-week unit plans organizing interconnected topics into coherent skill trajectories." },
+        { title: "Practical Lesson Plans", description: "Hardware lab and software coding session structures with step-by-step bench exercises and safety/debugging protocols." },
+        { title: "Activity-based Lesson Plans", description: "Interactive classroom strategies prioritizing peer collaboration, tactile experimentation, and scenario problem-solving." },
+        { title: "Beginner-level Lesson Plans", description: "Specialized gentle scaffolding that breaks intimidating jargon and complex formulas into intuitive mental models." }
+      ],
+      whatIsIncluded: [
+        "Structured lesson delivery roadmap with timed minute-by-minute guidance",
+        "Prerequisite knowledge check and introductory hook strategy",
+        "Detailed teacher explanation prompts, analogies, and whiteboard/boardwork diagrams",
+        "Student hands-on task prompts with differentiated tiers for varied paces",
+        "Assessment checkpoint questions with rubric guidance",
+        "Teacher self-reflection log and follow-up homework prompts"
+      ],
+      deliverables: [
+        "Print-ready formatted lesson plan documents (PDF)",
+        "Fully editable digital source files (Word / Google Docs)",
+        "Instructional activity cards & slide breakdown outline",
+        "Teacher quick-reference cue sheets for classroom execution"
+      ],
+      samplePreview: {
+        title: "Sample Structure Excerpt: IoT Sensor Interfacing (Lesson 04)",
+        excerpt: "[00-05 min: Contextual Hook - Real-world water wastage problem] -> [05-15 min: Concept Architecture - Voltage divider & analog pin conversion] -> [15-30 min: Guided Breadboard Setup - Circuit wiring & serial monitor debugging] -> [30-40 min: Individual Student Challenge - Calibrate dry vs. wet soil threshold] -> [40-45 min: Reflection & Formative Exit Ticket].",
+        notice: "Full complete lesson plans, exercise keys, and slides are delivered securely via licensed educational package upon confirmed project scope."
+      },
+      process: [
+        "Curriculum & Audience Diagnostic: We analyze your subject syllabus, target grade/skill level, and classroom facilities.",
+        "Instructional Objective Mapping: Define measurable student competencies for each lesson block.",
+        "Lesson Framework Drafting: Build timed delivery stages, analogies, practical tasks, and assessment triggers.",
+        "Educator Review & Customization: You review the draft for pacing adjustments specific to your teaching style.",
+        "Final Package Delivery: Receive polished, formatted, and ready-to-teach editable files."
+      ],
+      faqs: [
+        {
+          question: "Can you create lesson plans tailored to specific regional or national boards?",
+          answer: "Yes. Plans can be calibrated to align with local educational boards (e.g. Matric, FBISE, Cambridge IGCSE/O-Level, TVET/vocational technical frameworks) or custom institutional syllabi."
+        },
+        {
+          question: "Do your practical lesson plans include hardware component lists?",
+          answer: "Absolutely. Practical STEM/IoT plans detail exact component specs (e.g., ESP32, resistor values, breadboards), pin diagrams, and safety guidelines."
+        },
+        {
+          question: "In what format will I receive the lesson plans?",
+          answer: "You receive clean, professional PDF printouts as well as fully editable DOCX files so you can customize them across semesters."
+        }
+      ],
+      pricingType: "starting_at",
+      startingPrice: "$35",
+      premiumPrice: "$85",
+      deliveryTime: "2-4 Business Days",
+      icon: "BookOpen",
+      enabled: true,
+      order: 1
+    },
+    {
+      id: "ts-teaching-methods",
+      slug: "teaching-method-support",
+      title: "Teaching Method Support",
+      category: "Pedagogical Consulting",
+      subtitle: "Transform passive lectures into high-engagement, practical learning sessions tailored for technical & beginner students.",
+      shortDescription: "Evidence-based teaching techniques, active classroom management, theory-to-practice synchronization, and beginner engagement strategies.",
+      description: "When students lose interest or struggle to grasp technical subjects, the issue is almost never the students' intelligence—it is the instructional delivery method. Our Teaching Method Support equips educators with actionable pedagogical tools: from effective board breakdown and experiential inquiry to tactile hardware demonstrations and peer-driven problem solving.",
+      whoIsThisFor: [
+        "Educators facing low student participation, boredom, or absenteeism in technical classes",
+        "Subject-matter experts (engineers, programmers) transitioning into teaching roles",
+        "Instructors teaching mixed-ability classrooms with wide skill disparities",
+        "Academic heads seeking to elevate departmental teaching standards"
+      ],
+      subOfferings: [
+        { title: "Lesson Delivery Structure", description: "Mastering the Hook-Model-Apply-Reflect instructional delivery arc to eliminate student cognitive overload." },
+        { title: "Theory + Practical Planning", description: "Seamlessly marrying theoretical physics/math formulas to tangible breadboards, code editors, or real-world tools." },
+        { title: "Student Engagement Activities", description: "Dynamic classroom protocols including Think-Pair-Share, error-hunting challenges, and live coding relays." },
+        { title: "Beginner-Student Teaching Strategies", description: "Techniques for demystifying technical jargon, building psychological safety, and fostering curiosity." },
+        { title: "Classroom Activity Planning", description: "Time-bounded, highly structured physical and intellectual tasks that keep all students actively thinking." },
+        { title: "Practical Learning Approaches", description: "Shift from passive memorization to problem-driven engineering workflows mirroring real industrial challenges." }
+      ],
+      whatIsIncluded: [
+        "Pedagogical strategy toolkit customized to your subject domain",
+        "Classroom engagement framework with 12+ reusable interactive exercises",
+        "Scaffolding guides for beginner students experiencing math or coding anxiety",
+        "Step-by-step guidance for running friction-free practical laboratory sessions",
+        "Direct teacher feedback rubrics to assess engagement in real time"
+      ],
+      deliverables: [
+        "Teaching Methodology Implementation Guide (PDF & DOCX)",
+        "Quick-reference Classroom Engagement Playbook",
+        "Student Interaction Checklist for everyday lesson delivery",
+        "1-on-1 virtual walkthrough session (optional add-on)"
+      ],
+      samplePreview: {
+        title: "Sample Method Concept: The Dual-Track Theory-Lab Synchronization",
+        excerpt: "Never teach 45 minutes of abstract circuit equations followed by an isolated lab days later. Introduce a 7-minute visual concept teaser, prompt students to predict the voltmeter reading, verify on physical hardware within 8 minutes, and synthesize the mathematical equation together from the observed reality.",
+        notice: "Full pedagogical playbooks and workshop slides are provided in the complete customized consultation pack."
+      },
+      process: [
+        "Classroom Challenge Audit: Identify specific bottlenecks (e.g. passive students, rapid drop-off, concept confusion).",
+        "Methodology Calibration: Formulate a customized delivery model suited to your class size, subject, and physical environment.",
+        "Playbook Development: Compile concrete delivery techniques, scripts, and engagement prompts.",
+        "Review & Implementation Coaching: Walk through the strategies to ensure complete confidence.",
+        "Follow-Up Refinement: Review classroom results and fine-tune delivery pacing."
+      ],
+      faqs: [
+        {
+          question: "Can these methods work in classrooms with limited technology?",
+          answer: "Yes! Strategies are designed to thrive in both high-tech computer labs and standard chalkboard/whiteboard classrooms without expensive gear."
+        },
+        {
+          question: "How quickly can an instructor apply these techniques?",
+          answer: "From Day 1. The playbooks emphasize immediate, high-impact changes such as revised question phrasing, timed partner problem-solving, and visual framing."
+        }
+      ],
+      pricingType: "starting_at",
+      startingPrice: "$45",
+      premiumPrice: "$110",
+      deliveryTime: "3-5 Business Days",
+      icon: "Wrench",
+      enabled: true,
+      order: 2
+    },
+    {
+      id: "ts-course-training-structure",
+      slug: "course-and-training-structure",
+      title: "Course & Training Structure",
+      category: "Curriculum Architecture",
+      subtitle: "End-to-end curriculum design, modular outlines, progressive learning objectives, and vocational training schedules.",
+      shortDescription: "Architect complete educational curricula and boot camp training schedules with coherent prerequisite progressions, hands-on milestones, and objective milestones.",
+      description: "A successful educational program requires an architected roadmap. We design comprehensive course blueprints from scratch—whether for a 4-week youth computer literacy boot camp, a semester-long microcontroller curriculum, or professional corporate workforce upskilling. Every course structure balances rigorous fundamentals with practical portfolio projects.",
+      whoIsThisFor: [
+        "Vocational training centers, NGOs, and youth skill-development programs",
+        "Colleges and private academies launching new technical or computing courses",
+        "Instructors building their own commercial boot camps or online training cohorts",
+        "Corporate trainers standardizing onboarding technical curricula"
+      ],
+      subOfferings: [
+        { title: "Course Outlines", description: "Comprehensive course descriptions, prerequisite roadmaps, and high-level learning competencies." },
+        { title: "Module Structure", description: "Logical topic compartmentalization ensuring steady concept build-up without jarring skill leaps." },
+        { title: "Learning Objectives", description: "Bloom's taxonomy-aligned, measurable performance indicators for every module." },
+        { title: "Practical Activities", description: "Integrated hands-on assignments, team projects, and lab experiments mapped to each chapter." },
+        { title: "Training Schedules", description: "Day-by-day or week-by-week delivery schedules accounting for holidays, review buffers, and exam days." },
+        { title: "Assessment Structure", description: "Grading distributions, formative quiz schedules, midterm reviews, and capstone evaluation metrics." }
+      ],
+      whatIsIncluded: [
+        "Full Course Specification Document (Course Description, Aims, Competencies)",
+        "Module Breakdown Matrix with weekly time allocations and lab splits",
+        "Detailed Project Roadmap leading to a student portfolio piece",
+        "Required textbook, hardware equipment, and software tool lists",
+        "Instructor Teaching Guide & Scheduling Calendar"
+      ],
+      deliverables: [
+        "Master Curriculum & Course Guide (PDF + Editable DOCX)",
+        "Visual Course Roadmap Diagram for student onboarding / promotional brochures",
+        "Weekly Training Schedule spreadsheet / Gantt outline",
+        "Assessment weighting and criteria rubric"
+      ],
+      samplePreview: {
+        title: "Curriculum Blueprint Architecture Excerpt",
+        excerpt: "Module 01: Foundations (30% Theory, 70% Terminal Exploration) -> Module 02: Computational Logic (Guided Mini-Project) -> Module 03: Hardware / API Interfacing -> Capstone: Real-world Community Solution.",
+        notice: "Full institutional curriculum packages include complete accredited lecture schedules and lab requirements."
+      },
+      process: [
+        "Goal & Audience Specification: Clarify target learning outcomes, duration, student starting baseline, and institutional constraints.",
+        "Macro Scope & Sequence: Define high-level module hierarchy and core milestones.",
+        "Granular Module Construction: Flesh out topics, practical challenges, and assessment checkpoints.",
+        "Administrative & Teacher Alignment: Review with academic stakeholders for pacing and resource compatibility.",
+        "Final Package Deployment: Provide clean institutional documentation."
+      ],
+      faqs: [
+        {
+          question: "Can you design a course for non-technical beginners?",
+          answer: "Yes. Having designed and delivered UNICEF-supported IoT and Computer Operator courses for underprivileged youth, beginner scaffolding is a core specialization."
+        },
+        {
+          question: "Do you provide guidance on hardware/software procurement?",
+          answer: "Yes, every technical course specification includes recommended, budget-conscious component lists and free, open-source software options."
+        }
+      ],
+      pricingType: "custom_quote",
+      startingPrice: "$75",
+      premiumPrice: "$180",
+      deliveryTime: "5-7 Business Days",
+      icon: "Layers",
+      enabled: true,
+      order: 3
+    },
+    {
+      id: "ts-worksheets-assessments",
+      slug: "worksheets-and-assessments",
+      title: "Worksheets & Assessments",
+      category: "Assessment Design",
+      subtitle: "Accurately measure understanding with balanced MCQs, problem-solving worksheets, lab tasks, and grading rubrics.",
+      shortDescription: "Rigorous yet encouraging testing instruments: diagnostic quizzes, conceptual worksheets, hands-on lab challenges, and answer keys.",
+      description: "Fair and informative assessment design is essential for effective teaching. We create targeted evaluation material that tests real conceptual understanding rather than surface-level memorization. From rapid 5-minute exit tickets and scenario-based worksheets to comprehensive mid-term examination papers and practical bench tests.",
+      whoIsThisFor: [
+        "Teachers needing fresh, original worksheets and test questions to avoid textbook regurgitation",
+        "Vocational examiners designing practical hands-on grading criteria",
+        "Online educators requiring automated or printable quiz packs for their students",
+        "Institutions standardizing mid-term and final examination quality"
+      ],
+      subOfferings: [
+        { title: "MCQs & Conceptual Quizzes", description: "Carefully calibrated multiple-choice questions with plausible distractors that diagnose common misconceptions." },
+        { title: "Worksheets & Practice Sheets", description: "Structured step-by-step problem sets with graduated difficulty from beginner to advanced challenge." },
+        { title: "Assignments & Homework Sets", description: "Research-driven or code-building assignments that foster independent student discovery." },
+        { title: "Quizzes (Formative Assessments)", description: "Low-stakes 5-to-10 minute diagnostic quizzes to check understanding before moving ahead." },
+        { title: "Practical Tasks & Lab Challenges", description: "Concrete hands-on wiring, coding, or typing performance tasks with time targets." },
+        { title: "Basic Assessment Plans & Rubrics", description: "Objective grading rubrics and marking keys to ensure fair, transparent student feedback." }
+      ],
+      whatIsIncluded: [
+        "Student Examination / Worksheet Master (clean, printable layout)",
+        "Teacher Answer Key with step-by-step problem resolutions and diagnostic notes",
+        "Grading Rubric Matrix for open-ended or practical challenges",
+        "Differentiated versions for mixed-ability classrooms (Standard & Advanced)",
+        "Digitally fillable PDF and editable Word formats"
+      ],
+      deliverables: [
+        "Print-ready PDF worksheets (formatted for standard A4 paper)",
+        "Editable Word / Google Docs source files",
+        "Teacher Solution Guide with full scoring breakdowns",
+        "Quick MCQ answer grid for rapid grading"
+      ],
+      samplePreview: {
+        title: "Assessment Architecture Excerpt",
+        excerpt: "Section A: Conceptual Diagnosis (10 MCQs testing foundational logic) | Section B: Circuit Debugging / Code Tracing (Identify the bug in the given snippet) | Section C: Practical Design Challenge (Calculate component values for specific voltage threshold).",
+        notice: "Complete questions, student test sheets, and official answer keys are supplied via private delivery to verified educators."
+      },
+      process: [
+        "Curriculum Topic Alignment: You specify the chapter, module, and learning standards to assess.",
+        "Item Formulation: We write original, vetted questions balanced across Bloom's cognitive tiers.",
+        "Solution & Key Verification: Step-by-step solutions are generated and cross-checked for accuracy.",
+        "Layout & Formatting: Documents are typeset into clean, distraction-free printable formats.",
+        "Delivery: Receive both student worksheets and instructor answer keys."
+      ],
+      faqs: [
+        {
+          question: "Are complete answer keys and solutions provided?",
+          answer: "Yes, every assessment package includes a comprehensive Teacher Answer Key with detailed explanations for each question."
+        },
+        {
+          question: "Can questions be exported for Google Forms or online quiz platforms?",
+          answer: "Yes! Upon request, we format questions for easy import into Google Forms, Kahoot, or Moodle."
+        }
+      ],
+      pricingType: "starting_at",
+      startingPrice: "$25",
+      premiumPrice: "$60",
+      deliveryTime: "1-3 Business Days",
+      icon: "FileCheck",
+      enabled: true,
+      order: 4
+    },
+    {
+      id: "ts-teacher-consultation",
+      slug: "teacher-instructor-consultation",
+      title: "Teacher / Instructor Consultation",
+      category: "1-on-1 Mentorship",
+      subtitle: "Targeted problem-solving for classroom roadblocks: low student interest, engagement barriers, and technical explanation struggles.",
+      shortDescription: "Direct consultative troubleshooting for educators facing real classroom challenges. Get personalized advice, structured solutions, and actionable strategies.",
+      description: "Teaching is one of the most demanding professions in the world. When you face disengaged students, feel overwhelmed by lesson preparation, or struggle to communicate an intricate technical topic, you don't need generic theory—you need practical, real-world solutions from someone who has stood in front of challenging classrooms. Our 1-on-1 consultation delivers personalized troubleshooting for your exact teaching context.",
+      whoIsThisFor: [
+        "Teachers struggling with student apathy, low participation, or disruptive disengagement",
+        "Educators preparing for high-stakes demo lessons or teacher recruitment interviews",
+        "Technical instructors teaching students who lack computer or mathematical backgrounds",
+        "Instructors looking to revamp their lesson flow, laboratory structure, and energy"
+      ],
+      subOfferings: [
+        { title: "Students Are Not Participating", description: "Diagnose communication anxiety, restructure question loops, and install peer-discussion habits." },
+        { title: "Students Have Low Interest", description: "Anchor dry syllabus theory into immediate real-world utility, local challenges, and career aspirations." },
+        { title: "Students Are Beginners", description: "Construct gentle scaffolding analogies that give inexperienced learners early quick wins without overwhelming them." },
+        { title: "Difficulty Explaining a Topic", description: "Co-develop intuitive metaphors, physical demonstrations, and whiteboard steps for tough concepts." },
+        { title: "Need Practical Activities", description: "Design zero-cost or low-budget bench exercises and games that reinforce current textbook chapters." },
+        { title: "Need Lesson Structure & Timing", description: "Calibrate lesson pacing so you never run out of time or leave students stranded before the bell." },
+        { title: "Need Classroom Engagement Ideas", description: "Inject high-energy, structured interactive routines that revitalize sluggish morning or afternoon sessions." }
+      ],
+      whatIsIncluded: [
+        "Pre-session diagnostic intake to review your class syllabus and specific pain points",
+        "Dedicated 45-minute live consultation (via Google Meet / Zoom / WhatsApp Call)",
+        "Written Action Plan summarizing custom strategies, classroom scripts, and exercises",
+        "Follow-up email review of your next executed lesson plan"
+      ],
+      deliverables: [
+        "1-on-1 Dedicated Video / Audio Strategy Call",
+        "Customized Post-Call Action Plan & Classroom Script (PDF)",
+        "Recommended tools, activity templates, and pedagogical links",
+        "7-day follow-up messaging support for post-lesson feedback"
+      ],
+      samplePreview: {
+        title: "Sample Consultation Resolution Framework",
+        excerpt: "Problem: Students silent when asked questions. Diagnosis: Fear of public error in front of peers. Solution Installed: The 90-Second Silent Write + Pair Confirm protocol, shifting response rate from 5% to 85% in one week.",
+        notice: "Consultations are confidential and tailored directly to your specific teaching environment."
+      },
+      process: [
+        "Submit Challenge: Book your consultation and describe the specific obstacle you are experiencing.",
+        "Diagnostic Preparation: We analyze the challenge and prepare customized pedagogical interventions.",
+        "Live Strategy Session: 45 minutes of focused, collaborative problem-solving and role-play practice.",
+        "Action Plan Delivery: Receive your written implementation guide with scripts and exercises.",
+        "Classroom Execution & Follow-Up: Execute the strategy in class with follow-up support."
+      ],
+      faqs: [
+        {
+          question: "Can we focus on a specific difficult topic I have to teach next week?",
+          answer: "Yes! Many teachers use this consultation specifically to plan an upcoming difficult lecture, such as microcontrollers, binary logic, or circuit equations."
+        },
+        {
+          question: "What platforms do you use for the consultation call?",
+          answer: "We can connect via Google Meet, Zoom, or WhatsApp video/audio call based on your preference and internet bandwidth."
+        }
+      ],
+      pricingType: "fixed",
+      startingPrice: "$35",
+      premiumPrice: "$70",
+      deliveryTime: "Book within 24-48 Hours",
+      icon: "Users",
+      enabled: true,
+      order: 5
+    }
+  ],
+  teachingConsultation: {
+    title: "Teaching Consultation",
+    headline: "Having a teaching or classroom challenge? Let's work through it together.",
+    subtext: "Personalized 1-on-1 pedagogical troubleshooting for teachers, instructors, and training leads navigating low engagement, beginner anxiety, or curriculum pacing.",
+    price: "$35",
+    duration: "45 min Session",
+    topics: [
+      "Lesson planning & pacing",
+      "Student engagement & attention",
+      "Practical & hands-on teaching",
+      "Course & module structure",
+      "Classroom activities & games",
+      "Assessment & rubric planning",
+      "Beginner-level tech teaching",
+      "Training methodology & delivery"
+    ],
+    enabled: true
+  },
+  teachingProducts: [
+    {
+      id: "tp-stem-lesson-kit",
+      title: "Complete STEM & IoT Lesson Plan Starter Pack",
+      category: "Lesson Plan Templates",
+      description: "10 modular, editable lesson blueprints for teaching microcontroller fundamentals, digital sensors, and introductory C++ logic.",
+      deliverableFormat: "ZIP / DOCX / PDF",
+      price: "$29",
+      previewPoints: [
+        "10 Fully scripted daily lesson blueprints",
+        "Accompanying slide outline and circuit diagrams",
+        "Student lab challenge sheets with debug checklists",
+        "Formative exit tickets and evaluation rubrics"
+      ],
+      isPaid: true,
+      status: "active"
+    },
+    {
+      id: "tp-active-engagement-playbook",
+      title: "Active Classroom Engagement Playbook for Tech Instructors",
+      category: "Teaching Templates",
+      description: "20 battle-tested pedagogical routines and interactive exercises designed to keep students awake, active, and coding.",
+      deliverableFormat: "PDF & Editable Docs",
+      price: "$19",
+      previewPoints: [
+        "20 High-participation classroom protocols",
+        "Step-by-step facilitation scripts and timer guidelines",
+        "Techniques for cold-calling without generating anxiety",
+        "Peer-review workflows for coding and circuit labs"
+      ],
+      isPaid: true,
+      status: "active"
+    },
+    {
+      id: "tp-hardware-lab-rubrics",
+      title: "Vocational & Computer Operator Assessment Pack",
+      category: "Assessment Packs",
+      description: "Standardized evaluation rubrics, practical typing benchmarks, and system troubleshooting exam papers.",
+      deliverableFormat: "PDF & Editable Spreadsheets",
+      price: "$25",
+      previewPoints: [
+        "Grading rubrics for MS Office productivity & hardware handling",
+        "Timed typing & data-entry diagnostic tests",
+        "Practical bench troubleshooting test scenarios",
+        "Official teacher scoring guides and grade calculators"
+      ],
+      isPaid: true,
+      status: "active"
+    }
+  ],
+  teachingRequests: [
+    {
+      id: "treq-seed-1",
+      fullName: "Kamran Shah",
+      email: "kamran.shah.edu@gmail.com",
+      whatsapp: "03001234567",
+      country: "Pakistan",
+      userRole: "Teacher",
+      subject: "Computer Science & Basic IoT",
+      studentLevel: "Beginners (Grades 8-10)",
+      topic: "Introduction to Microcontrollers & Digital Sensors",
+      courseOrModule: "Vocational STEM Foundation",
+      requiredServiceId: "ts-lesson-plans",
+      requiredServiceName: "Lesson Plan Development",
+      numberOfLessons: "5 Lessons",
+      requiredFormat: "Editable Word / Google Docs",
+      deadline: "10 Days",
+      budget: "$50 - $80",
+      additionalRequirements: "Need practical breadboard wiring instructions included for each lesson so students can follow along in the computer lab.",
+      status: "REVIEWING",
+      createdAt: "2025-02-13T10:30:00.000Z",
+      adminNotes: "Drafting 5-lesson sequence. Communicated via WhatsApp."
+    }
+  ]
 };
+

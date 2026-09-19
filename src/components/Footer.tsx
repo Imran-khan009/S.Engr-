@@ -78,7 +78,7 @@ export const Footer: React.FC<FooterProps> = ({ socials, onOpenAdmin, onOpenProj
                 <a href="#skills" className="hover:text-cyan-400 transition-colors">Skills Ecosystem</a>
               </li>
               <li>
-                <a href="#teach" className="hover:text-cyan-400 transition-colors">Teaching & Mentorship</a>
+                <a href="#teaching-services" className="hover:text-cyan-400 transition-colors">Teaching & Education Services</a>
               </li>
               <li>
                 <a href="#contact" className="hover:text-cyan-400 transition-colors">Contact Imran</a>

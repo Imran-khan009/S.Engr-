@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Service, Lead } from '../types';
-import { X, Send, CheckCircle2, AlertCircle, Upload, ShieldCheck, Clock, DollarSign } from 'lucide-react';
+import { X, Send, CheckCircle2, AlertCircle, Upload, ShieldCheck, Clock, DollarSign, FileText } from 'lucide-react';
+import { uploadToStorageOrFallback, validateAttachmentFile } from '../lib/storage';
 
 interface ProjectRequestModalProps {
   isOpen: boolean;
@@ -32,10 +33,14 @@ export const ProjectRequestModal: React.FC<ProjectRequestModalProps> = ({
     deadline: '1-2 Weeks',
     preferredContactMethod: 'WhatsApp',
     platformPreference: 'Direct' as 'Direct' | 'Fiverr' | 'Upwork',
-    fileName: ''
+    fileName: '',
+    fileUrl: '',
+    fileSize: '',
+    fileType: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submittedLead, setSubmittedLead] = useState<Lead | null>(null);
 
@@ -52,10 +57,31 @@ export const ProjectRequestModal: React.FC<ProjectRequestModalProps> = ({
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, fileName: file.name }));
+    if (!file) return;
+
+    const validation = validateAttachmentFile(file);
+    if (!validation.valid) {
+      setErrorMessage(validation.error || 'Invalid file');
+      return;
+    }
+
+    setErrorMessage(null);
+    setIsUploadingFile(true);
+    try {
+      const uploadRes = await uploadToStorageOrFallback(file, 'leads');
+      setFormData(prev => ({
+        ...prev,
+        fileName: uploadRes.fileName,
+        fileUrl: uploadRes.fileUrl || '',
+        fileSize: uploadRes.fileSize,
+        fileType: uploadRes.fileType
+      }));
+    } catch (err: any) {
+      setErrorMessage(err.message || 'File upload failed');
+    } finally {
+      setIsUploadingFile(false);
     }
   };
 
@@ -105,7 +131,10 @@ export const ProjectRequestModal: React.FC<ProjectRequestModalProps> = ({
       deadline: '1-2 Weeks',
       preferredContactMethod: 'WhatsApp',
       platformPreference: 'Direct',
-      fileName: ''
+      fileName: '',
+      fileUrl: '',
+      fileSize: '',
+      fileType: ''
     });
     onClose();
   };
@@ -400,12 +429,32 @@ export const ProjectRequestModal: React.FC<ProjectRequestModalProps> = ({
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Project Specification File (Optional)
+                      Project Specification File (Optional, max 10MB)
                     </label>
-                    <label className="flex items-center justify-center px-3.5 py-2 rounded-xl bg-slate-950/80 border border-dashed border-slate-700 hover:border-cyan-500 cursor-pointer text-xs text-slate-400 truncate">
-                      <Upload className="w-4 h-4 mr-2 text-cyan-400" />
-                      <span>{formData.fileName || 'Attach Brief / Requirements'}</span>
-                      <input type="file" onChange={handleFileUpload} className="hidden" />
+                    <label className="flex items-center justify-center px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-dashed border-slate-700 hover:border-cyan-500 cursor-pointer text-xs text-slate-400 truncate">
+                      {isUploadingFile ? (
+                        <span className="text-cyan-400 animate-pulse font-mono">Uploading to secure storage...</span>
+                      ) : formData.fileName ? (
+                        <div className="flex items-center space-x-1.5 text-cyan-300 truncate">
+                          <FileText className="w-4 h-4 text-cyan-400 shrink-0" />
+                          <span className="truncate">{formData.fileName}</span>
+                          {formData.fileSize && (
+                            <span className="text-[10px] text-slate-400 font-mono">({formData.fileSize})</span>
+                          )}
+                        </div>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2 text-cyan-400" />
+                          <span>Attach PDF, Word, PPT or Image</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.webp"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        disabled={isUploadingFile}
+                      />
                     </label>
                   </div>
                 </div>

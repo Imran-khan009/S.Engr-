@@ -64,7 +64,17 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           {/* Quick Summary Pill Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80">
             <div>
-              <span className="text-[10px] uppercase font-mono text-slate-400 block">Starting At</span>
+              <span className="text-[10px] uppercase font-mono text-slate-400 block">
+                {service.pricingModel === 'fixed'
+                  ? 'Fixed Price'
+                  : service.pricingModel === 'hourly'
+                  ? 'Hourly Rate'
+                  : service.pricingModel === 'milestone'
+                  ? 'Milestone Model'
+                  : service.pricingModel === 'custom_quote'
+                  ? 'Custom Scope'
+                  : 'Starting At'}
+              </span>
               <span className="text-base font-bold text-cyan-300 font-mono">{service.startingPrice}</span>
             </div>
             <div>
@@ -161,7 +171,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                       <p className="text-[11px] font-mono text-slate-400">{p.projectType}</p>
                     </div>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
-                      Verified
+                      Active Project
                     </span>
                   </div>
                 ))}

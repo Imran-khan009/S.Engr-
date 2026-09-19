@@ -18,7 +18,7 @@ export const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-800/40 text-cyan-400 font-mono text-xs uppercase tracking-wider mb-3">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Verified Career Record</span>
+            <span>Professional Career Record</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 uppercase">
             EXPERIENCE & EDUCATION
@@ -48,9 +48,16 @@ export const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({
 
                   <div className="bg-slate-900/70 border border-slate-800/80 hover:border-cyan-500/40 rounded-2xl p-6 transition-all shadow-md">
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <span className="text-xs font-mono font-bold text-cyan-400 px-2.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-800/50">
-                        {exp.dates}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs font-mono font-bold text-cyan-400 px-2.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-800/50">
+                          {exp.dates}
+                        </span>
+                        {exp.trade && (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800/80 text-emerald-300 font-semibold">
+                            Trade: {exp.trade}
+                          </span>
+                        )}
+                      </div>
                       <span className="text-xs font-mono text-slate-400 flex items-center">
                         <MapPin className="w-3.5 h-3.5 mr-1 text-slate-500" />
                         {exp.location}
@@ -60,9 +67,15 @@ export const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({
                     <h4 className="text-lg font-bold text-white mb-0.5">
                       {exp.role}
                     </h4>
-                    <p className="text-xs font-medium text-slate-300 mb-4">
+                    <p className="text-xs font-medium text-slate-300">
                       {exp.organization}
                     </p>
+                    {exp.supportingProgram && (
+                      <p className="text-[11px] font-mono text-cyan-400/90 mb-4 mt-0.5">
+                        {exp.supportingProgram}
+                      </p>
+                    )}
+                    {!exp.supportingProgram && <div className="mb-4" />}
 
                     <div className="space-y-2 mb-4">
                       {exp.responsibilities.map((resp, idx) => (
