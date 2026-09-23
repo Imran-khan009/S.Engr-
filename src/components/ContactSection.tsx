@@ -1,467 +1,326 @@
 import React, { useState } from 'react';
-import { Mail, MessageCircle, MapPin, Send, CheckCircle2, AlertCircle, ExternalLink, Globe } from 'lucide-react';
+import { Mail, ExternalLink, Send, ShieldCheck, CheckCircle2, Clock, MapPin, Sparkles } from 'lucide-react';
+import { WhatsAppIcon } from './SocialIcons';
 import { SocialPlatform } from '../types';
-import { IconHelper } from './IconHelper';
 
 interface ContactSectionProps {
-  email?: string;
-  whatsapp?: string;
-  location?: string;
   socials?: SocialPlatform[];
+  onOpenProjectModal?: () => void;
 }
 
-export const ContactSection: React.FC<ContactSectionProps> = ({
-  email = "contact.engrimran@gmail.com",
-  whatsapp = "03331244214",
-  location = "HUB Chowki Balochistan",
-  socials
-}) => {
+export const ContactSection: React.FC<ContactSectionProps> = () => {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
-    subject: '',
+    serviceNeeded: 'Web & Software Development',
+    budget: '$100 - $300',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // Normalize WhatsApp number for wa.me URL
-  const cleanPhone = whatsapp.replace(/\D/g, '');
-  const waUrl = cleanPhone.startsWith('0') 
-    ? `https://wa.me/92${cleanPhone.substring(1)}`
-    : cleanPhone.startsWith('92') 
-      ? `https://wa.me/${cleanPhone}`
-      : `https://wa.me/923331244214`;
+  const [submitted, setSubmitted] = useState(false);
+  const [mailtoUrl, setMailtoUrl] = useState('');
 
-  // Default accounts if socials prop is not provided or incomplete
-  const defaultSocials: SocialPlatform[] = [
-    {
-      id: "soc-whatsapp",
-      platform: "WhatsApp",
-      name: "Direct WhatsApp",
-      url: waUrl,
-      handle: "03331244214",
-      description: "Instant direct chat for urgent project requirements and timelines.",
-      icon: "whatsapp",
-      enabled: true
-    },
-    {
-      id: "soc-fiverr",
-      platform: "Fiverr",
-      name: "Fiverr Marketplace",
-      url: "https://www.fiverr.com/imran_khan1327",
-      handle: "@imran_khan1327",
-      description: "Book professional web development, IoT solutions, and design services.",
-      icon: "fiverr",
-      enabled: true
-    },
-    {
-      id: "soc-facebook",
-      platform: "Facebook",
-      name: "Facebook Page",
-      url: "https://www.facebook.com/profile.php?id=61586602392197",
-      handle: "Engr. Imran Khan Official",
-      description: "Community updates, training workshops, and project showcases.",
-      icon: "facebook",
-      enabled: true
-    },
-    {
-      id: "soc-instagram",
-      platform: "Instagram",
-      name: "Instagram Account",
-      url: "https://www.instagram.com/teachwithimran/?fbclid=IwY2xjawUY3OtwZG9mAWV4dG4DYWVtAjEwAGJyaWQRMWViR1pwaVBSZFk5TzFRcUdzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeAv9ABRKX-4RSnDZM4U6yVvGtXYP4IB6gWrxdbxPx_DWJOZh9qc9OuMAln-4_aem_DA-2uqN7atJgb2zdqpJRAQ",
-      handle: "@teachwithimran",
-      description: "Behind-the-scenes engineering builds, design prototypes, and reels.",
-      icon: "instagram",
-      enabled: true
-    },
-    {
-      id: "soc-linkedin",
-      platform: "LinkedIn",
-      name: "LinkedIn ID",
-      url: "https://www.linkedin.com/in/imran-khan-b7299833a/",
-      handle: "imran-khan-b7299833a",
-      description: "Professional profile, engineering publications, and career updates.",
-      icon: "linkedin",
-      enabled: true
-    },
-    {
-      id: "soc-tiktok",
-      platform: "TikTok",
-      name: "TikTok Account",
-      url: "https://www.tiktok.com/@teachwithimran?_r=1&_t=ZS-97yZged8h9B&fbclid=IwY2xjawUY3FVwZG9mAWV4dG4DYWVtAjEwAGJyaWQRMWViR1pwaVBSZFk5TzFRcUdzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeB8UmAeVy_CWK7c5CUpW_o6Z77mkL-4RREzh8MRt1V16tH4u7fjpzvPxALto_aem_dXXpmci886GN_KWqPbqf7A",
-      handle: "@teachwithimran",
-      description: "Bite-sized technology demonstrations and smart circuit experiments.",
-      icon: "tiktok",
-      enabled: true
-    },
-    {
-      id: "soc-youtube",
-      platform: "YouTube",
-      name: "YouTube Channel",
-      url: "https://www.youtube.com/@TeachWithImran1",
-      handle: "@TeachWithImran1",
-      description: "Tutorials on IoT, programming, and tech education.",
-      icon: "youtube",
-      enabled: true
-    }
+  const servicesList = [
+    'Web & Software Development',
+    'IoT & Smart Hardware',
+    'Brand Identity & Graphic Design',
+    'Meta Ads & Digital Marketing',
+    'Video Editing',
+    'Construction 2D CAD & Site Coordination'
   ];
 
-  const displaySocials: SocialPlatform[] = socials && socials.length > 0 ? socials : defaultSocials;
-
-  const getBrandDesign = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'whatsapp':
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-[#25D366]/60 hover:shadow-lg hover:shadow-[#25D366]/10',
-          iconBox: 'bg-[#25D366]/15 text-[#25D366] border-[#25D366]/30 group-hover:bg-[#25D366] group-hover:text-white',
-          badge: 'bg-[#25D366]/10 text-[#25D366] border-[#25D366]/30',
-          hoverText: 'group-hover:text-[#25D366]',
-          accentText: 'text-[#25D366]'
-        };
-      case 'fiverr':
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-[#1DBF73]/60 hover:shadow-lg hover:shadow-[#1DBF73]/10',
-          iconBox: 'bg-[#1DBF73]/15 text-[#1DBF73] border-[#1DBF73]/30 group-hover:bg-[#1DBF73] group-hover:text-white',
-          badge: 'bg-[#1DBF73]/10 text-[#1DBF73] border-[#1DBF73]/30',
-          hoverText: 'group-hover:text-[#1DBF73]',
-          accentText: 'text-[#1DBF73]'
-        };
-      case 'facebook':
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-[#1877F2]/60 hover:shadow-lg hover:shadow-[#1877F2]/10',
-          iconBox: 'bg-[#1877F2]/15 text-[#1877F2] border-[#1877F2]/30 group-hover:bg-[#1877F2] group-hover:text-white',
-          badge: 'bg-[#1877F2]/10 text-[#1877F2] border-[#1877F2]/30',
-          hoverText: 'group-hover:text-[#1877F2]',
-          accentText: 'text-[#1877F2]'
-        };
-      case 'instagram':
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-[#E1306C]/60 hover:shadow-lg hover:shadow-[#E1306C]/10',
-          iconBox: 'bg-gradient-to-tr from-[#FD1D1D]/20 via-[#E1306C]/20 to-[#833AB4]/20 text-[#E1306C] border-[#E1306C]/30 group-hover:from-[#F56040] group-hover:to-[#833AB4] group-hover:text-white',
-          badge: 'bg-[#E1306C]/10 text-[#E1306C] border-[#E1306C]/30',
-          hoverText: 'group-hover:text-[#E1306C]',
-          accentText: 'text-[#E1306C]'
-        };
-      case 'linkedin':
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-[#0A66C2]/60 hover:shadow-lg hover:shadow-[#0A66C2]/10',
-          iconBox: 'bg-[#0A66C2]/15 text-[#0A66C2] border-[#0A66C2]/30 group-hover:bg-[#0A66C2] group-hover:text-white',
-          badge: 'bg-[#0A66C2]/10 text-[#0A66C2] border-[#0A66C2]/30',
-          hoverText: 'group-hover:text-[#0A66C2]',
-          accentText: 'text-[#0A66C2]'
-        };
-      case 'tiktok':
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-[#25F4EE]/60 hover:shadow-lg hover:shadow-[#FE2C55]/10',
-          iconBox: 'bg-slate-900 text-white border-slate-700/80 group-hover:border-[#25F4EE] group-hover:text-[#25F4EE] group-hover:shadow-[0_0_12px_rgba(37,244,238,0.3)]',
-          badge: 'bg-slate-800 text-slate-200 border-slate-700',
-          hoverText: 'group-hover:text-[#25F4EE]',
-          accentText: 'text-[#25F4EE]'
-        };
-      case 'youtube':
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-[#FF0000]/60 hover:shadow-lg hover:shadow-[#FF0000]/10',
-          iconBox: 'bg-[#FF0000]/15 text-[#FF0000] border-[#FF0000]/30 group-hover:bg-[#FF0000] group-hover:text-white',
-          badge: 'bg-[#FF0000]/10 text-[#FF0000] border-[#FF0000]/30',
-          hoverText: 'group-hover:text-[#FF0000]',
-          accentText: 'text-[#FF0000]'
-        };
-      case 'upwork':
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-[#14A800]/60 hover:shadow-lg hover:shadow-[#14A800]/10',
-          iconBox: 'bg-[#14A800]/15 text-[#14A800] border-[#14A800]/30 group-hover:bg-[#14A800] group-hover:text-white',
-          badge: 'bg-[#14A800]/10 text-[#14A800] border-[#14A800]/30',
-          hoverText: 'group-hover:text-[#14A800]',
-          accentText: 'text-[#14A800]'
-        };
-      default:
-        return {
-          cardBorder: 'border-slate-800/80 hover:border-cyan-500/60 hover:shadow-lg hover:shadow-cyan-500/10',
-          iconBox: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-slate-950',
-          badge: 'bg-cyan-950/60 text-cyan-400 border-cyan-800',
-          hoverText: 'group-hover:text-cyan-300',
-          accentText: 'text-cyan-400'
-        };
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    if (!formData.name || !formData.email || !formData.message) {
-      setError('Please provide your name, email, and message.');
+    if (!formData.name.trim() || !formData.message.trim()) {
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to send message.');
-      setSuccess(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch (err: any) {
-      setError(err.message || 'Error sending message.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    const waText = `Assalam-o-Alaikum Engr. Imran,\n\n*Name:* ${formData.name}\n*Service Needed:* ${formData.serviceNeeded}\n*Budget:* ${formData.budget}\n*Message:* ${formData.message}\n\n(Sent via S • ENGR Hub Official Contact Form)`;
+    const waUrl = `https://wa.me/923331244214?text=${encodeURIComponent(waText)}`;
+    
+    const mailSubject = `Project Inquiry: ${formData.serviceNeeded} - ${formData.name}`;
+    const mailBody = `Name: ${formData.name}\nService Needed: ${formData.serviceNeeded}\nBudget: ${formData.budget}\n\nMessage:\n${formData.message}`;
+    const mailUrl = `mailto:s.engrimran@gmail.com?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+
+    setMailtoUrl(mailUrl);
+    setSubmitted(true);
+
+    // Open WhatsApp in new tab
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+
+    // Also attempt background sync if backend is active
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: formData.name,
+        email: 'Direct-WhatsApp-Submission',
+        category: formData.serviceNeeded,
+        message: `Budget: ${formData.budget} | Message: ${formData.message}`
+      })
+    }).catch(() => {
+      // Graceful fallback
+    });
   };
 
   return (
-    <section id="contact" className="py-24 bg-slate-950 text-slate-100 border-t border-slate-900 relative">
+    <section id="contact" className="py-24 bg-[#080d1a] text-slate-100 border-t border-slate-900 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
-          {/* Left Column: Direct Info */}
-          <div className="lg:col-span-5 space-y-6">
+        
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-orange-950/40 border border-orange-500/30 text-orange-400 font-mono text-xs uppercase tracking-wider mb-3">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Direct Client Communications</span>
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 uppercase">
+            FIND ME ONLINE &amp; GET IN TOUCH
+          </h2>
+          <p className="text-base sm:text-lg text-slate-300">
+            Reach out directly for custom engineering scopes, website developments, microcontroller prototypes, or verified escrow orders.
+          </p>
+        </div>
+
+        {/* 1. FIND ME ONLINE: Exactly 3 Highlighted Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          
+          {/* Card 1: Direct WhatsApp */}
+          <a
+            id="contact-card-whatsapp"
+            href="https://wa.me/923331244214?text=Assalam-o-Alaikum%20Engr.%20Imran,%20I%20would%20like%20to%20discuss%20a%20project%20with%20you."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-7 rounded-3xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-emerald-500/50 transition-all duration-300 hover:-translate-y-1 shadow-xl hover:shadow-emerald-950/20 group flex flex-col justify-between"
+          >
             <div>
-              <div className="flex items-center space-x-2 text-cyan-400 font-mono text-xs tracking-wider uppercase mb-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                <span>Get in Touch</span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <WhatsAppIcon className="w-6 h-6" />
+                </div>
+                <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
+                  Instant Response
+                </span>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight uppercase">
-                LET'S TALK SOLUTIONS
-              </h2>
-              <p className="mt-3 text-sm text-slate-400 leading-relaxed">
-                Whether you have an upcoming web development project, an IoT prototype inquiry, or need technical site coordination, I respond promptly.
+
+              <h3 className="text-xl font-bold text-white mb-1 group-hover:text-emerald-300 transition-colors">
+                Direct WhatsApp
+              </h3>
+              <p className="font-mono text-sm text-emerald-400 font-semibold mb-3">
+                03331244214
+              </p>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Direct chat for urgent requirements, real-time code discussions, and swift project kickoffs.
               </p>
             </div>
 
-            <div className="space-y-4 pt-2">
-              {/* WhatsApp Direct Card */}
-              <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-[#25D366]/50 transition-all flex items-start justify-between group">
-                <div className="flex items-start space-x-4">
-                  <div className="w-11 h-11 rounded-xl bg-[#25D366]/15 text-[#25D366] flex items-center justify-center shrink-0 border border-[#25D366]/30 group-hover:bg-[#25D366] group-hover:text-white transition-colors">
-                    <IconHelper name="whatsapp" className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-[10px] font-mono text-[#25D366] uppercase tracking-wider block">WhatsApp Direct</span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-ping" />
-                    </div>
-                    <a
-                      href={waUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-base font-bold text-white hover:text-[#25D366] transition-colors font-mono block mt-0.5"
-                    >
-                      {whatsapp}
-                    </a>
-                    <span className="text-[11px] text-slate-400 block mt-0.5">Quick consultation & file sharing</span>
-                  </div>
-                </div>
-                <a
-                  href={waUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366] text-[#25D366] hover:text-slate-950 border border-[#25D366]/30 text-xs font-mono font-bold transition-all flex items-center space-x-1 shrink-0"
-                >
-                  <span>Chat</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              {/* Location Card */}
-              <div className="flex items-center space-x-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
-                <div className="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/20">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Location</span>
-                  <span className="text-base font-bold text-white block mt-0.5">
-                    {location}
-                  </span>
-                  <span className="text-[11px] text-slate-400">Available locally & for global remote contracts</span>
-                </div>
-              </div>
-
-              {/* Official Email Card */}
-              <div className="flex items-center space-x-4 p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-cyan-500/40 transition-all">
-                <div className="w-11 h-11 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-500/20">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Official Email</span>
-                  <a href={`mailto:${email}`} className="text-sm font-bold text-white hover:text-cyan-400 transition-colors block mt-0.5 break-all">
-                    {email}
-                  </a>
-                  <span className="text-[11px] text-slate-400">Formal RFP & project specifications</span>
-                </div>
-              </div>
+            <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-emerald-400">
+              <span>Message on WhatsApp</span>
+              <ExternalLink className="w-4 h-4" />
             </div>
-          </div>
+          </a>
 
-          {/* Right Column: Contact Message Form */}
-          <div className="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
-            <h3 className="text-xl font-bold text-white mb-2">
-              Send a Message
-            </h3>
-            <p className="text-xs text-slate-400 mb-6 font-mono">
-              Have a general inquiry or invitation? Fill out the form below.
-            </p>
-
-            {success ? (
-              <div className="text-center py-10 bg-slate-950/60 rounded-2xl border border-emerald-500/30 p-6">
-                <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-                <h4 className="text-lg font-bold text-white mb-1">Message Sent Successfully!</h4>
-                <p className="text-xs text-slate-300 max-w-sm mx-auto mb-4">
-                  Thank you for reaching out. Engr. Imran Khan will review your message and reply promptly.
-                </p>
-                <button
-                  onClick={() => setSuccess(false)}
-                  className="px-5 py-2 rounded-xl text-xs font-semibold text-cyan-400 bg-cyan-950/60 border border-cyan-800 hover:bg-cyan-900 transition-colors"
-                >
-                  Send Another Message
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
-                  <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-800 text-xs text-rose-300 flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span>{error}</span>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Your Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Asad Ullah"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
-                      Your Email *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="e.g. asad@domain.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    placeholder="e.g. Web Project / IoT Solution / Teaching Workshop"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Message *
-                  </label>
-                  <textarea
-                    rows={4}
-                    required
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="How can I assist you with web development, IoT solutions, creative design, or training?"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 resize-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 transition-all shadow-md shadow-cyan-500/20 flex items-center justify-center space-x-2 disabled:opacity-50"
-                >
-                  {isSubmitting ? <span>Sending...</span> : (
-                    <>
-                      <span>SUBMIT INQUIRY</span>
-                      <Send className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-
-        {/* Dedicated Social & Online Presence Block inside Contact Section */}
-        <div className="pt-10 border-t border-slate-900">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          {/* Card 2: Official Email */}
+          <a
+            id="contact-card-email"
+            href="mailto:s.engrimran@gmail.com"
+            className="p-7 rounded-3xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-orange-500/50 transition-all duration-300 hover:-translate-y-1 shadow-xl hover:shadow-orange-950/20 group flex flex-col justify-between"
+          >
             <div>
-              <div className="flex items-center space-x-2 text-cyan-400 font-mono text-xs uppercase tracking-wider mb-1">
-                <Globe className="w-3.5 h-3.5" />
-                <span>Official Accounts & Marketplaces</span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Mail className="w-6 h-6" />
+                </div>
+                <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-orange-950 text-orange-400 border border-orange-800">
+                  Official Inquiries
+                </span>
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white uppercase tracking-tight">
-                Connect on My Social & Professional Networks
+
+              <h3 className="text-xl font-bold text-white mb-1 group-hover:text-orange-300 transition-colors">
+                Official Email
               </h3>
+              <p className="font-mono text-sm text-orange-400 font-semibold mb-3">
+                s.engrimran@gmail.com
+              </p>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Send technical documentation, architectural briefs, RFP specifications, or institutional teaching invitations.
+              </p>
             </div>
-            <p className="text-xs text-slate-400 max-w-md sm:text-right font-mono">
-              Direct official touchpoints for Engr. Imran Khan across YouTube, Facebook, Instagram, LinkedIn, TikTok & Fiverr.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {displaySocials.filter(s => s.enabled).map((item) => {
-              const brand = getBrandDesign(item.platform);
-              return (
-                <a
-                  key={item.id}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-4 rounded-2xl bg-slate-900/70 hover:bg-slate-900 border transition-all duration-200 group flex flex-col justify-between ${brand.cardBorder}`}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 ${brand.iconBox}`}>
-                        <IconHelper name={item.icon || item.platform} className="w-5 h-5" />
-                      </div>
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded border transition-colors ${brand.badge}`}>
-                        {item.platform}
-                      </span>
-                    </div>
+            <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-orange-400">
+              <span>Send Email</span>
+              <ExternalLink className="w-4 h-4" />
+            </div>
+          </a>
 
-                    <h4 className={`text-sm font-bold text-white transition-colors ${brand.hoverText}`}>
-                      {item.name}
-                    </h4>
-                    <p className={`text-xs font-mono mb-2 truncate ${brand.accentText}`}>
-                      {item.handle}
-                    </p>
-                    <p className="text-[11px] text-slate-400 leading-relaxed mb-4 line-clamp-2">
-                      {item.description}
-                    </p>
-                  </div>
+          {/* Card 3: Fiverr Marketplace */}
+          <a
+            id="contact-card-fiverr"
+            href="https://www.fiverr.com/imran_khan1327"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-7 rounded-3xl bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-1 shadow-xl hover:shadow-blue-950/20 group flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform font-mono font-extrabold text-lg">
+                  fi
+                </div>
+                <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-blue-950 text-blue-400 border border-blue-800">
+                  Escrow Protected
+                </span>
+              </div>
 
-                  <div className={`pt-2 border-t border-slate-800/60 flex items-center justify-between text-xs font-mono font-semibold text-slate-300 transition-colors ${brand.hoverText}`}>
-                    <span>Connect Official</span>
-                    <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </div>
-                </a>
-              );
-            })}
-          </div>
+              <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-300 transition-colors">
+                Fiverr Marketplace
+              </h3>
+              <p className="font-mono text-sm text-blue-400 font-semibold mb-3">
+                @imran_khan1327
+              </p>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Order directly with guaranteed milestone escrow buyer protection and international platform guarantees.
+              </p>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-bold text-blue-400">
+              <span>Visit Fiverr Profile</span>
+              <ExternalLink className="w-4 h-4" />
+            </div>
+          </a>
+
         </div>
+
+        {/* 2. Simple Contact Form (Name, Service Needed dropdown, Budget, Message) */}
+        <div className="max-w-3xl mx-auto bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
+          
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center">
+              <Send className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-white">
+                Project Inquiry &amp; Direct Quote
+              </h3>
+              <p className="text-xs text-slate-400">
+                Submit this form to launch an instant prefilled WhatsApp message with email fallback.
+              </p>
+            </div>
+          </div>
+
+          {submitted ? (
+            <div className="p-6 rounded-2xl bg-slate-950 border border-orange-500/40 text-center space-y-4">
+              <div className="w-12 h-12 mx-auto rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-bold text-white">
+                Inquiry Prepared &amp; WhatsApp Opened!
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto">
+                Your prefilled project details have opened in WhatsApp. If WhatsApp didn't open automatically, you can also send via your email client below:
+              </p>
+              <div className="pt-2 flex flex-wrap justify-center gap-3">
+                <a
+                  href={mailtoUrl}
+                  className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 flex items-center space-x-2 border border-slate-700"
+                >
+                  <Mail className="w-4 h-4 text-orange-400" />
+                  <span>Send via Mailto Fallback</span>
+                </a>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-xs font-bold text-white cursor-pointer"
+                >
+                  Submit Another Inquiry
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              
+              {/* Name Field */}
+              <div>
+                <label className="block text-xs font-mono font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  Your Full Name <span className="text-orange-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. Tariq Ahmed / Sarah Jenkins"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:border-orange-500 focus:outline-none text-white text-sm"
+                />
+              </div>
+
+              {/* Service Needed Dropdown (6 services) */}
+              <div>
+                <label className="block text-xs font-mono font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  Service Needed <span className="text-orange-400">*</span>
+                </label>
+                <select
+                  value={formData.serviceNeeded}
+                  onChange={(e) => setFormData({ ...formData, serviceNeeded: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:border-orange-500 focus:outline-none text-white text-sm cursor-pointer"
+                >
+                  {servicesList.map((srv) => (
+                    <option key={srv} value={srv}>
+                      {srv}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Budget Field */}
+              <div>
+                <label className="block text-xs font-mono font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  Estimated Budget
+                </label>
+                <select
+                  value={formData.budget}
+                  onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:border-orange-500 focus:outline-none text-white text-sm cursor-pointer"
+                >
+                  <option value="$75 - $150">$75 - $150 (Basic / Asset / Ad Setup)</option>
+                  <option value="$150 - $350">$150 - $350 (Full Website / Custom Prototype)</option>
+                  <option value="$350 - $700">$350 - $700 (Full-Stack App / Multi-Sensor IoT)</option>
+                  <option value="$700+">$700+ (Comprehensive Turnkey Project)</option>
+                  <option value="Flexible / To Discuss">Flexible / To Discuss</option>
+                </select>
+              </div>
+
+              {/* Message Field */}
+              <div>
+                <label className="block text-xs font-mono font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  Project Scope &amp; Details <span className="text-orange-400">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="Describe your goals, technical specifications, deadlines, or questions..."
+                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:border-orange-500 focus:outline-none text-white text-sm resize-none"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-400 hover:to-amber-500 transition-all shadow-lg shadow-orange-500/25 flex items-center justify-center space-x-2 cursor-pointer"
+              >
+                <WhatsAppIcon className="w-4 h-4" />
+                <span>Submit &amp; Chat on WhatsApp (+ Mailto Fallback)</span>
+              </button>
+
+              <div className="flex items-center justify-center space-x-2 text-[11px] text-slate-400 pt-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-orange-400" />
+                <span>Strict privacy guarantee. No spam, unsolicited calls, or data sharing.</span>
+              </div>
+
+            </form>
+          )}
+
+        </div>
+
       </div>
     </section>
   );
 };
-

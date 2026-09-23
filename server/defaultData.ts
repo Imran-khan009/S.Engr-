@@ -494,74 +494,84 @@ export const defaultSiteData: FullSiteData = {
   experiences: [
     {
       id: "exp-iot-unicef",
-      role: "IoT Instructor",
+      role: "Instructor – Internet of Things (IoT)",
       trade: "IoT",
-      organization: "ALP Centre / Jamia Hussainia Naimia",
+      organization: "ALP Centre (UNICEF)",
       supportingProgram: "UNICEF-supported program",
       location: "Hub, Balochistan",
-      startDate: "07-Jun-2024",
+      startDate: "Jan 2025",
       status: "Present",
-      dates: "07-Jun-2024 – Present",
+      dates: "Jan 2025 – Present",
       responsibilities: [
-        "Delivered hands-on training on microcontrollers (Arduino Uno, ESP32) and circuit fundamentals in the UNICEF-supported ALP program.",
-        "Guided students through real-world sensor integration (temperature, ultrasonic, soil moisture, motion detection).",
-        "Mentored student capstone projects from component selection to breadboard assembly and functional C++ code.",
-        "Emphasized practical problem-solving: connecting embedded hardware to solve local community challenges."
+        "Delivered specialized hands-on IoT training on microcontrollers, circuit fundamentals, and practical sensor wiring in the UNICEF-supported ALP program.",
+        "Guided students through hands-on projects including RC Robo Car with Remote Control and Agriculture Water Maintain Systems.",
+        "Demonstrated strong classroom management, student engagement, and teaching ethics verified through vatt.gov.pk professional induction."
       ],
-      skills: ["IoT Systems", "Trade: IoT", "Arduino", "ESP32", "C++ Embedded", "Hands-on Pedagogy", "Circuit Prototyping"],
+      skills: ["IoT Systems", "Trade: IoT", "UNICEF ALP", "Arduino", "ESP32", "C++ Embedded", "Hands-on Pedagogy"],
       verified: true
     },
     {
-      id: "exp-comp-unicef",
-      role: "Computer Operator Instructor",
-      trade: "Computer Operator",
-      organization: "GBHS Jam Yousaf Colony, District Hub",
-      supportingProgram: "UNICEF / European Union supported program",
-      location: "District Hub, Balochistan",
-      startDate: "Apr-2025",
+      id: "exp-iot-systems",
+      role: "(IOT) Information Technology & Embedded Systems",
+      trade: "Embedded Systems",
+      organization: "Engineering Systems Development",
+      location: "Hub, Balochistan",
+      startDate: "2020",
       status: "Present",
-      dates: "Apr-2025 – Present",
+      dates: "2020 – Present",
       responsibilities: [
-        "Conducted professional computing and digital literacy workshops for enrolled youth under the UNICEF / European Union supported program.",
-        "Taught advanced Microsoft Office suites (Excel formulas, data entry, Word formatting, PowerPoint presentation).",
-        "Instructed students on computer hardware diagnostics, operating system fundamentals, and internet safety.",
-        "Prepared learners for practical employment and freelance digital workplace opportunities."
+        "Developed RC Robo Car With Remote Control utilizing wireless telemetry and motor driver circuits.",
+        "Built Agriculture Water Maintain System ensuring automated soil hydration and reservoir monitoring.",
+        "Engineered full-stack and front-end user interfaces using HTML, CSS, JavaScript, and algorithmic C++ solutions.",
+        "Handled technical documentation with discretion and maintained structured engineering records."
       ],
-      skills: ["Computer Operation", "MS Excel", "MS Word", "Operating Systems", "Classroom Mentorship", "Data Management"],
+      skills: ["RC Robo Car", "Smart Agriculture System", "C++", "JavaScript", "HTML/CSS", "Hardware Integration"],
       verified: true
     },
     {
-      id: "exp-construction-coord",
-      role: "Construction & Site Engineering Coordinator",
-      organization: "Regional Civil Infrastructure Works",
-      location: "Hub & Regional Sites",
-      dates: "2021 – 2024",
+      id: "exp-civil-engr",
+      role: "Assistant Civil Engineer (Private Practice)",
+      trade: "Civil Engineering",
+      organization: "M. Rahim & Sons",
+      location: "Hub, Balochistan, Pakistan",
+      startDate: "2017",
+      status: "Completed",
+      dates: "2017 – 2020",
       responsibilities: [
-        "Produced and updated 2D AutoCAD site layouts, verifying ground measurements against technical blueprints.",
-        "Coordinated with site foremen and technical labor crews to ensure structural alignment and safety standards.",
-        "Documented daily site logs, material schedules, and progress reports for project stakeholders.",
-        "Assisted in resolving on-site dimensional clashes before costly structural works commenced."
+        "Assisted in preparing structural layouts, site plans, and engineering drawings.",
+        "Supervised construction sites, ensuring quality control, accurate measurements, and timely completion of tasks.",
+        "Conducted material inspections and verified work compliance with engineering standards.",
+        "Supported senior engineer in design modifications, structural planning, and contractor/client coordination.",
+        "Maintained construction documentation and official project records."
       ],
-      skills: ["2D AutoCAD", "Site Coordination", "Workforce Management", "Measurement Verification", "Civil Engineering Diploma"],
+      skills: ["Site Supervision", "Structural Layouts", "Material Inspection", "AutoCAD Drafting", "Client Coordination"],
       verified: true
     }
   ],
   education: [
     {
       id: "edu-bscs",
-      degree: "Bachelor of Science in Computer Science (BS CS)",
-      institution: "Lasbela University of Agriculture, Water & Marine Sciences (LUAWMS)",
-      dates: "Graduated",
-      location: "Uthal, Balochistan",
+      degree: "Bachelor's Science in Computer Science",
+      institution: "Lasbela University of Agriculture, Water and Marine Sciences (LUAWMS)",
+      dates: "2020 – 2024",
+      location: "Balochistan, Pakistan",
       details: "Comprehensive study of software engineering, programming paradigms (C++, JavaScript), database systems, algorithm design, and modern computer systems."
     },
     {
-      id: "edu-diploma-civil",
-      degree: "Diploma of Associate Engineering (DAE) in Civil Engineering",
-      institution: "Recognized Board of Technical Education [Institutional details verified upon request]",
-      dates: "Completed",
-      location: "Balochistan / Pakistan",
-      details: "Foundational training in surveying, 2D drafting, structural measurements, construction materials, building layouts, and site management practices."
+      id: "edu-intermediate",
+      degree: "Intermediate",
+      institution: "GOVT: DEGREE COLLEGE (HUB)",
+      dates: "09-AUG-2019",
+      location: "Hub, Balochistan",
+      details: "Higher secondary education with concentration in pre-engineering mathematics, physics, and chemistry."
+    },
+    {
+      id: "edu-matric",
+      degree: "Matric",
+      institution: "Noor Public High School (HUB)",
+      dates: "21-08-2017",
+      location: "Hub, Balochistan",
+      details: "Secondary school certificate with distinction in science curriculum."
     }
   ],
   skillCategories: [

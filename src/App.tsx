@@ -7,27 +7,28 @@ import React, { useState, useEffect } from 'react';
 import { FullSiteData, Service, Lead, TeachingService } from './types';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { QuickIntro } from './components/QuickIntro';
-import { ServicesMarketplace } from './components/ServicesMarketplace';
-import { ServiceDetailModal } from './components/ServiceDetailModal';
-import { Portfolio } from './components/Portfolio';
-import { HireMeSection } from './components/HireMeSection';
-import { FreelanceHub } from './components/FreelanceHub';
-import { TeachingSection } from './components/TeachingSection';
-import { TeachingServiceDetailModal } from './components/TeachingServiceDetailModal';
-import { TeachingRequestModal } from './components/TeachingRequestModal';
-import { ExperienceTimeline } from './components/ExperienceTimeline';
-import { SkillsEcosystem } from './components/SkillsEcosystem';
 import { AboutSection } from './components/AboutSection';
+import { ServicesMarketplace } from './components/ServicesMarketplace';
+import { Portfolio } from './components/Portfolio';
+import { StatsSection } from './components/StatsSection';
+import { TestimonialsSection } from './components/TestimonialsSection';
+import { ExperienceTimeline } from './components/ExperienceTimeline';
+import { TeachingSection } from './components/TeachingSection';
+import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+
+// Modals
+import { ServiceDetailModal } from './components/ServiceDetailModal';
 import { ProjectRequestModal } from './components/ProjectRequestModal';
 import { AdminDashboard } from './components/AdminDashboard';
-import { DemoBanner } from './components/DemoBanner';
-import { DemoComparisonModal } from './components/DemoComparisonModal';
+import { TeachingServiceDetailModal } from './components/TeachingServiceDetailModal';
+import { TeachingRequestModal } from './components/TeachingRequestModal';
 import { CustomWebsiteModal } from './components/CustomWebsiteModal';
-import { AmbientVisualSystem } from './components/AmbientVisualSystem';
-import { SectionReveal } from './components/SectionReveal';
+import { DemoComparisonModal } from './components/DemoComparisonModal';
+import { DemoBanner } from './components/DemoBanner';
+import { CvModal } from './components/CvModal';
 import { Loader2 } from 'lucide-react';
 
 export default function App() {
@@ -36,16 +37,16 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>('home');
 
-  // Modals state
+  // Modal States
   const [isProjectModalOpen, setIsProjectModalOpen] = useState<boolean>(false);
   const [isComparisonModalOpen, setIsComparisonModalOpen] = useState<boolean>(false);
   const [isCustomWebsiteModalOpen, setIsCustomWebsiteModalOpen] = useState<boolean>(false);
   const [selectedServiceForModal, setSelectedServiceForModal] = useState<Service | null>(null);
   const [selectedDetailService, setSelectedDetailService] = useState<Service | null>(null);
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | undefined>(undefined);
   const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
+  const [isCvModalOpen, setIsCvModalOpen] = useState<boolean>(false);
 
-  // Teaching modals state
+  // Teaching Modals State
   const [selectedTeachingServiceForDetail, setSelectedTeachingServiceForDetail] = useState<TeachingService | null>(null);
   const [isTeachingDetailModalOpen, setIsTeachingDetailModalOpen] = useState<boolean>(false);
   const [selectedTeachingServiceForRequest, setSelectedTeachingServiceForRequest] = useState<TeachingService | null>(null);
@@ -71,11 +72,11 @@ export default function App() {
     fetchSiteData();
   }, []);
 
-  // Track active section for Navbar highlight
+  // Track active section for top navigation highlighting (6 items: home, services, work, experience, contact)
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['home', 'services', 'work', 'experience', 'skills', 'teaching-services', 'teach', 'contact'];
-      const scrollPosition = window.scrollY + 100;
+      const sections = ['home', 'about', 'services', 'work', 'experience', 'teaching-services', 'contact'];
+      const scrollPosition = window.scrollY + 120;
       for (const sectionId of sections) {
         const el = document.getElementById(sectionId);
         if (el) {
@@ -115,16 +116,6 @@ export default function App() {
     handleOpenProjectModal(matchedService);
   };
 
-  const handleSelectSkillForInquiry = (skillName: string) => {
-    handleOpenProjectModal();
-  };
-
-  const handleExploreCategory = (category: string) => {
-    setSelectedCategoryFilter(category);
-    const el = document.getElementById('services');
-    el?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const handleOpenTeachingDetail = (service: TeachingService) => {
     setSelectedTeachingServiceForDetail(service);
     setIsTeachingDetailModalOpen(true);
@@ -142,33 +133,29 @@ export default function App() {
     setIsTeachingRequestModalOpen(true);
   };
 
-  const handleOpenTeachingConsultation = () => {
-    const consultationService = siteData?.teachingServices?.find(s => s.id === 'ts-consultation');
-    setSelectedTeachingServiceForRequest(consultationService || null);
-    setIsTeachingCustomMode(false);
-    setIsTeachingRequestModalOpen(true);
+  const handleScrollToTeaching = () => {
+    const el = document.getElementById('teaching-services');
+    el?.scrollIntoView({ behavior: 'smooth' });
   };
 
   if (isLoading && !siteData) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-300 font-mono">
-        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin mb-4" />
+      <div className="min-h-screen bg-[#080d1a] flex flex-col items-center justify-center text-slate-300 font-mono">
+        <Loader2 className="w-8 h-8 text-orange-400 animate-spin mb-4" />
         <span className="text-sm font-bold text-white tracking-widest uppercase">
-          Initializing S • ENGR Hub...
+          Initializing S • ENGR - Engr. Imran Khan...
         </span>
-        <span className="text-xs text-slate-500 mt-2">
-          Engr. Imran Khan Portfolio & Service Marketplace
+        <span className="text-xs text-slate-400 mt-2">
+          Engineering Solutions &amp; Verified Services Marketplace
         </span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-slate-950 relative">
-      {/* High-Performance Mouse-Reactive Spotlight and Ambient Background */}
-      <AmbientVisualSystem />
-
-      {/* Top Fixed Header with Demo Banner & Navbar */}
+    <div className="min-h-screen bg-[#080d1a] text-slate-100 flex flex-col relative selection:bg-orange-500 selection:text-white">
+      
+      {/* Sticky Top Header: Simplified to 6 nav items */}
       <div className="fixed top-0 left-0 right-0 z-50">
         {siteData?.settings?.demoMode === true && (
           <DemoBanner
@@ -180,142 +167,95 @@ export default function App() {
           onOpenHireModal={handleOpenHireModal}
           onOpenAdmin={() => setIsAdminOpen(true)}
           onOpenCustomModal={() => setIsCustomWebsiteModalOpen(true)}
+          onOpenCvModal={() => setIsCvModalOpen(true)}
           demoMode={Boolean(siteData?.settings?.demoMode)}
           activeSection={activeSection}
         />
       </div>
 
       <main className="flex-1 relative z-10">
-        {/* Section 1: Hero */}
+        
+        {/* 1. Hero Section: Single H1, Trust Sub-line, 2 CTAs, Photo, Ambient Glow in hero only */}
         <Hero
           onExploreWork={() => {
             const el = document.getElementById('work');
             el?.scrollIntoView({ behavior: 'smooth' });
           }}
           onHireMe={() => handleOpenProjectModal()}
-          onMyServices={() => {
-            const el = document.getElementById('services');
-            el?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          onSelectCategory={(category) => handleExploreCategory(category as any)}
+          onOpenCvModal={() => setIsCvModalOpen(true)}
         />
 
-        {/* Section 2: Quick Introduction & Identity Pillars */}
-        <SectionReveal>
-          <QuickIntro
-            onExploreCategory={handleExploreCategory}
-          />
-        </SectionReveal>
+        {/* 2. About Section: Story, Execution Loop & Embedded "Skills Ecosystem" Strip */}
+        <AboutSection
+          onHireMe={() => handleOpenProjectModal()}
+          categories={siteData?.skillCategories || []}
+          onSelectSkillForInquiry={() => handleOpenProjectModal()}
+        />
 
-        {/* Sections 3 - 14: Services Marketplace */}
-        {siteData?.services && (siteData.settings?.showServices ?? true) && (
-          <SectionReveal>
-            <ServicesMarketplace
-              services={siteData.services}
-              onViewDetails={(service) => setSelectedDetailService(service)}
-              onRequestService={(service) => handleOpenProjectModal(service)}
-              selectedCategoryFilter={selectedCategoryFilter}
-              onClearCategoryFilter={() => setSelectedCategoryFilter(undefined)}
-              showPricing={siteData.settings?.showPricing ?? true}
-              showFeatures={siteData.settings?.showFeatures ?? true}
-              showServices={siteData.settings?.showServices ?? true}
-            />
-          </SectionReveal>
-        )}
+        {/* 3. Services: ONE single consolidated 6-card section (Deleted other duplicates) */}
+        <ServicesMarketplace
+          services={siteData?.services || []}
+          onViewDetails={(service) => setSelectedDetailService(service)}
+          onRequestService={(service) => handleOpenProjectModal(service)}
+          showPricing={siteData?.settings?.showPricing ?? true}
+          showServices={siteData?.settings?.showServices ?? true}
+        />
 
-        {/* Featured Projects & Technical Diagrams */}
+        {/* 4. Work Section: Real-world projects with interactive schematics */}
         {siteData?.projects && (
-          <SectionReveal>
-            <Portfolio
-              projects={siteData.projects}
-              onRequestSimilarService={handleRequestSimilar}
-            />
-          </SectionReveal>
-        )}
-
-        {/* Section 15: Need a Professional Solution? Hire Me */}
-        <SectionReveal>
-          <HireMeSection
-            onViewDemo={() => setIsComparisonModalOpen(true)}
-            onRequestCustomWebsite={() => setIsCustomWebsiteModalOpen(true)}
-            onContactMe={() => {
-              const el = document.getElementById('contact');
-              el?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            onStartProject={() => handleOpenProjectModal()}
-            onViewServices={() => {
-              const el = document.getElementById('services');
-              el?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            ctaTitle={siteData?.settings?.ctaTitle}
-            ctaSupportingText={siteData?.settings?.ctaSupportingText}
-            whatsappNumber={siteData?.settings?.whatsapp}
+          <Portfolio
+            projects={siteData.projects}
+            onRequestSimilarService={handleRequestSimilar}
           />
-        </SectionReveal>
-
-        {/* Section 16: Find Me Online (Freelance & Social Hub) */}
-        {siteData?.socials && (
-          <SectionReveal>
-            <FreelanceHub socials={siteData.socials} />
-          </SectionReveal>
         )}
 
-        {/* Section 17: Teaching & Education Services */}
-        <SectionReveal>
+        {/* 5. Trust Proof Part 1: Results in Numbers (Stats Strip after WORK) */}
+        <StatsSection />
+
+        {/* 5. Trust Proof Part 2: Testimonials Section */}
+        <TestimonialsSection testimonials={siteData?.testimonials} />
+
+        {/* 5. Trust Proof Part 3: Verified Experience Records & Teaching Callout Banner */}
+        <ExperienceTimeline
+          experiences={siteData?.experiences || []}
+          education={siteData?.education || []}
+          onOpenTeachingServices={handleScrollToTeaching}
+          onOpenCvModal={() => setIsCvModalOpen(true)}
+        />
+
+        {/* Teaching Services (Linked from Footer and Experience Section) */}
+        {siteData?.teachingServices && (
           <TeachingSection
-            services={siteData?.teachingServices || []}
-            consultation={siteData?.teachingConsultation}
-            products={siteData?.teachingProducts || []}
+            services={siteData.teachingServices}
+            consultation={siteData.teachingConsultation}
+            products={siteData.teachingProducts || []}
             onOpenDetailModal={handleOpenTeachingDetail}
             onOpenRequestModal={handleOpenTeachingRequest}
             onOpenCustomRequest={handleOpenTeachingCustomRequest}
-            onOpenConsultationModal={handleOpenTeachingConsultation}
+            onOpenConsultationModal={() => handleOpenTeachingRequest()}
           />
-        </SectionReveal>
-
-        {/* Section 18 & 19: Experience & Education Timeline */}
-        {siteData?.experiences && siteData?.education && (
-          <SectionReveal>
-            <ExperienceTimeline
-              experiences={siteData.experiences}
-              education={siteData.education}
-            />
-          </SectionReveal>
         )}
 
-        {/* Section 20: Skills Ecosystem (Matrix without fake % bars) */}
-        {siteData?.skillCategories && (
-          <SectionReveal>
-            <SkillsEcosystem
-              categories={siteData.skillCategories}
-              onSelectSkillForInquiry={handleSelectSkillForInquiry}
-            />
-          </SectionReveal>
-        )}
+        {/* 6. FAQ Section: 5 questions with semantic <details> for SEO */}
+        <FaqSection />
 
-        {/* Section 21: About Section (Professional Story) */}
-        <SectionReveal>
-          <AboutSection
-            onHireMe={() => handleOpenProjectModal()}
-          />
-        </SectionReveal>
+        {/* 4. Contact Section: FIND ME ONLINE (3 cards) + Simple Contact Form with WhatsApp/Mailto */}
+        <ContactSection
+          socials={siteData?.socials || []}
+          onOpenProjectModal={() => handleOpenProjectModal()}
+        />
 
-        {/* Contact Section */}
-        <SectionReveal>
-          <ContactSection
-            email={siteData?.settings?.email}
-            whatsapp={siteData?.settings?.whatsapp}
-            location={siteData?.settings?.location}
-            socials={siteData?.socials}
-          />
-        </SectionReveal>
       </main>
 
-      {/* Section 24: Footer */}
+      {/* Floating WhatsApp Action Button (bottom-right on mobile & desktop) */}
+      <FloatingWhatsApp />
+
+      {/* Footer: Unified brand, mini social icons with aria-labels, copyright, Back-to-Top */}
       <Footer
         socials={siteData?.socials || []}
         onOpenAdmin={() => setIsAdminOpen(true)}
         onOpenProjectModal={() => handleOpenProjectModal()}
+        onOpenTeachingServices={handleScrollToTeaching}
       />
 
       {/* Service Detail Modal */}
@@ -342,7 +282,7 @@ export default function App() {
         />
       )}
 
-      {/* Admin Dashboard Modal */}
+      {/* Admin Dashboard */}
       <AdminDashboard
         isOpen={isAdminOpen}
         onClose={() => setIsAdminOpen(false)}
@@ -350,7 +290,7 @@ export default function App() {
         onRefreshData={fetchSiteData}
       />
 
-      {/* Demo vs. Paid Comparison Modal */}
+      {/* Demo Comparison Modal */}
       <DemoComparisonModal
         isOpen={isComparisonModalOpen}
         onClose={() => setIsComparisonModalOpen(false)}
@@ -361,13 +301,11 @@ export default function App() {
         premiumFeatures={siteData?.settings?.premiumFeatures}
       />
 
-      {/* Custom Website Requirements Intake Modal */}
+      {/* Custom Website Modal */}
       <CustomWebsiteModal
         isOpen={isCustomWebsiteModalOpen}
         onClose={() => setIsCustomWebsiteModalOpen(false)}
-        onRequestSubmitted={() => {
-          fetchSiteData();
-        }}
+        onRequestSubmitted={() => fetchSiteData()}
       />
 
       {/* Teaching Service Detail Modal */}
@@ -390,6 +328,13 @@ export default function App() {
         isCustomMode={isTeachingCustomMode}
         onSuccess={() => fetchSiteData()}
       />
+
+      {/* Official Verified CV / Technical Profile Modal */}
+      <CvModal
+        isOpen={isCvModalOpen}
+        onClose={() => setIsCvModalOpen(false)}
+      />
+
     </div>
   );
 }

@@ -55,9 +55,9 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
               <button
                 key={label}
                 onClick={() => setActiveCategory(rawCat)}
-                className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-semibold tracking-wider transition-all duration-200 ${
+                className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-semibold tracking-wider transition-all duration-200 cursor-pointer ${
                   isSelected
-                    ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20 font-bold'
+                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20 font-bold'
                     : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
                 }`}
               >
@@ -67,13 +67,13 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
           })}
         </div>
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        {/* Projects Grid: 3 cols desktop, horizontal slider 2 cols on mobile */}
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-5 pb-4 lg:grid lg:grid-cols-3 lg:gap-8 lg:overflow-visible no-scrollbar">
           {filteredProjects.map((project) => (
             <div
               key={project.id}
               id={`project-card-${project.id}`}
-              className="bg-slate-900/60 border border-slate-800/80 hover:border-cyan-500/40 rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-950/20 group"
+              className="w-[85%] sm:w-[48%] shrink-0 snap-start lg:w-auto bg-slate-900/60 border border-slate-800/80 hover:border-orange-500/40 rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-950/20 group"
             >
               <div>
                 {/* Visual Header / Diagram Banner */}
@@ -81,7 +81,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
                   {project.images?.[0] ? (
                     <img
                       src={project.images[0]}
-                      alt={project.title}
+                      alt={`Project screenshot: ${project.title} - ${project.category}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75 group-hover:opacity-90"
                       referrerPolicy="no-referrer"
                       loading="lazy"
@@ -97,11 +97,11 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
 
                   {/* Badges */}
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                    <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-slate-950/80 text-cyan-400 border border-cyan-500/30 backdrop-blur-sm">
+                    <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-slate-950/80 text-orange-400 border border-orange-500/30 backdrop-blur-sm">
                       {project.projectType}
                     </span>
                     {project.diagramType && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-700/60 flex items-center space-x-1">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-orange-950/80 text-orange-300 border border-orange-700/60 flex items-center space-x-1">
                         <Cpu className="w-3 h-3" />
                         <span>Interactive Circuit</span>
                       </span>
@@ -112,7 +112,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
                     <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-0.5 truncate">
                       {project.category}
                     </span>
-                    <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors truncate">
+                    <h3 className="text-base font-bold text-white group-hover:text-orange-400 transition-colors truncate">
                       {project.title}
                     </h3>
                   </div>
@@ -120,6 +120,14 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
 
                 {/* Content */}
                 <div className="p-5 sm:p-6">
+                  {/* Key Metric Highlight if present */}
+                  {project.keyMetric && (
+                    <div className="flex items-center space-x-1.5 text-[11px] font-mono font-semibold text-emerald-400 bg-emerald-950/70 border border-emerald-800/70 px-2.5 py-1.5 rounded-xl mb-3 shadow-sm">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span className="line-clamp-1">{project.keyMetric}</span>
+                    </div>
+                  )}
+
                   <p className="text-xs sm:text-sm text-slate-300 mb-4 line-clamp-3 leading-relaxed">
                     {project.description}
                   </p>
@@ -130,7 +138,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
                       <strong className="text-rose-400 font-mono">Problem:</strong> {project.problem}
                     </div>
                     <div className="text-slate-300 line-clamp-1">
-                      <strong className="text-cyan-400 font-mono">Solution:</strong> {project.solution}
+                      <strong className="text-orange-400 font-mono">Solution:</strong> {project.solution}
                     </div>
                   </div>
 
@@ -155,13 +163,36 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
 
               {/* Bottom Actions */}
               <div className="p-5 sm:p-6 pt-0 border-t border-slate-800/60 mt-2">
-                <div className="flex items-center justify-between pt-3">
-                  <span className="text-[11px] font-mono text-slate-500">
-                    Role: <strong className="text-slate-300">{project.role}</strong>
-                  </span>
+                <div className="flex items-center justify-between pt-3 gap-2 flex-wrap">
+                  <div className="flex items-center space-x-2">
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center space-x-1 text-[11px] font-mono font-bold text-cyan-400 hover:text-cyan-300 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-800/80 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                        title="Open Live Project Demo / Repository"
+                      >
+                        <span>Demo / Repo</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                    {project.githubUrl && project.githubUrl !== project.liveUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center space-x-1 text-[11px] font-mono text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                        title="GitHub Repository"
+                      >
+                        <Github className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+
                   <button
                     onClick={() => setSelectedProject(project)}
-                    className="inline-flex items-center space-x-1.5 text-xs font-bold text-cyan-400 hover:text-cyan-300 transition-colors uppercase tracking-wider"
+                    className="inline-flex items-center space-x-1.5 text-xs font-bold text-orange-400 hover:text-orange-300 transition-colors uppercase tracking-wider cursor-pointer ml-auto"
                   >
                     <span>VIEW DETAILS</span>
                     <Eye className="w-3.5 h-3.5" />
@@ -190,21 +221,51 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
                   {selectedProject.title}
                 </h3>
               </div>
-              <button
-                onClick={() => setSelectedProject(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center space-x-2">
+                {selectedProject.liveUrl && (
+                  <a
+                    href={selectedProject.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-cyan-400 bg-cyan-950/70 border border-cyan-800 hover:bg-cyan-900 transition-colors"
+                  >
+                    <span>Live Demo / Code</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Scrollable details */}
             <div className="p-6 sm:p-8 overflow-y-auto space-y-6 flex-1">
+              {/* Key Metric Highlight */}
+              {selectedProject.keyMetric && (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/50 to-cyan-950/40 border border-emerald-800/60 flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold block">
+                      Proven Result &amp; Key Engineering Metric
+                    </span>
+                    <p className="text-xs sm:text-sm font-semibold text-white">
+                      {selectedProject.keyMetric}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* If project has an interactive circuit/diagram, render it prominently! */}
               {selectedProject.diagramType && (
                 <div>
                   <h4 className="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-2 font-semibold">
-                    Interactive Engineering & Circuit Schematic
+                    Interactive Engineering &amp; Circuit Schematic
                   </h4>
                   <TechnicalDiagram type={selectedProject.diagramType} />
                 </div>

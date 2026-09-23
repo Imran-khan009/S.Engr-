@@ -1,33 +1,43 @@
 import express from 'express';
 import path from 'path';
 import crypto from 'crypto';
+import helmet from 'helmet';
+import cors from 'cors';
 import { createServer as createViteServer } from 'vite';
 import {
   getDatabase,
-  addLead,
-  updateLeadStatus,
-  deleteLead,
-  addContactMessage,
-  updateService,
-  updateProject,
-  updateSettings,
+  getSiteDataAsync,
+  addLeadAsync,
+  updateLeadStatusAsync,
+  deleteLeadAsync,
+  addContactMessageAsync,
+  updateServiceAsync,
+  updateProjectAsync,
+  updateSettingsAsync,
   resetToDefaults,
   saveDatabase,
-  addCustomWebsiteRequest,
-  updateCustomWebsiteRequestStatus,
-  deleteCustomWebsiteRequest,
-  addTeachingRequest,
-  updateTeachingRequestStatus,
-  deleteTeachingRequest,
-  saveTeachingService,
-  deleteTeachingService,
-  updateTeachingConsultation
+  addCustomWebsiteRequestAsync,
+  updateCustomWebsiteRequestStatusAsync,
+  deleteCustomWebsiteRequestAsync,
+  addTeachingRequestAsync,
+  updateTeachingRequestStatusAsync,
+  deleteTeachingRequestAsync,
+  saveTeachingServiceAsync,
+  deleteTeachingServiceAsync,
+  updateTeachingConsultationAsync
 } from './server/db';
 import {
   getServerSupabase,
   verifySupabaseToken,
   syncDatabaseToSupabase
 } from './server/supabase';
+import {
+  sanitizeText,
+  stripHtml,
+  validateEmail,
+  sanitizePhone,
+  sanitizeStringArray
+} from './server/sanitize';
 import { LeadStatus, CustomRequestStatus, TeachingRequestStatus } from './src/types';
 
 // ==============================================================================
@@ -133,7 +143,8 @@ function removeSession(token: string): boolean {
 
 // ==============================================================================
 // AUTHENTICATION MIDDLEWARE
-// Supports both Supabase Auth JWTs & Secure Session Tokens
+// Primary: Stateless Supabase Auth JWT Verification (Scales across Cloud Run instances)
+// Fallback: In-memory session tokens for single-instance passkey fallback
 // ==============================================================================
 async function adminAuthMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authHeader = req.headers.authorization;
@@ -145,7 +156,14 @@ async function adminAuthMiddleware(req: express.Request, res: express.Response, 
   const token = authHeader.substring(7).trim();
   const now = Date.now();
 
-  // 1. Check local session store
+  // 1. Primary: Verify stateless Supabase Auth JWT token (stateless & multi-instance ready)
+  const supaUser = await verifySupabaseToken(token);
+  if (supaUser) {
+    (req as any).adminUser = supaUser;
+    return next();
+  }
+
+  // 2. Fallback: Check local session map (for fallback passkey sessions)
   const session = activeSessions.get(token);
   if (session) {
     if (now > session.expiresAt) {
@@ -158,21 +176,6 @@ async function adminAuthMiddleware(req: express.Request, res: express.Response, 
     return next();
   }
 
-  // 2. Check direct Supabase Auth JWT token
-  const supaUser = await verifySupabaseToken(token);
-  if (supaUser) {
-    // Cache the verified Supabase token as an active session for efficiency
-    activeSessions.set(token, {
-      token,
-      createdAt: now,
-      expiresAt: now + SESSION_TTL_MS,
-      userId: supaUser.id,
-      email: supaUser.email,
-      authMethod: 'supabase'
-    });
-    return next();
-  }
-
   res.status(401).json({ error: 'Unauthorized: Invalid or expired admin credentials' });
 }
 
@@ -182,17 +185,23 @@ async function checkIsAdmin(req: express.Request): Promise<boolean> {
   if (!authHeader || !authHeader.startsWith('Bearer ')) return false;
 
   const token = authHeader.substring(7).trim();
+
+  // 1. Primary stateless Supabase check
+  const supaUser = await verifySupabaseToken(token);
+  if (supaUser) return true;
+
+  // 2. In-memory session check
   const session = activeSessions.get(token);
   if (session && Date.now() <= session.expiresAt) {
     return true;
   }
 
-  const supaUser = await verifySupabaseToken(token);
-  return !!supaUser;
+  return false;
 }
 
 // ==============================================================================
 // FILE VALIDATION HELPERS
+// Metadata-only validation for attachments uploaded directly to Supabase Storage
 // ==============================================================================
 const ALLOWED_MIME_TYPES = new Set([
   'application/pdf',
@@ -249,7 +258,53 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json({ limit: '15mb' }));
+  // 1. Security Headers via Helmet
+  app.use(helmet({
+    contentSecurityPolicy: false, // Managed by Vite build & framework assets
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    frameguard: false, // Disabled to allow Google AI Studio preview iframe rendering
+    hsts: process.env.NODE_ENV === 'production' ? {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    } : false,
+    xContentTypeOptions: true,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    dnsPrefetchControl: { allow: false }
+  }));
+
+  // 2. CORS Hardening
+  const allowedOrigins = [
+    process.env.APP_URL,
+    process.env.VITE_APP_URL,
+    'https://ai.studio',
+    'https://aistudio.google.com'
+  ].filter(Boolean) as string[];
+
+  app.use(cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, same-origin navigations)
+      if (!origin) return callback(null, true);
+
+      const isCloudRun = /^https:\/\/[a-z0-9-]+\.(?:asia-southeast1|us-central1|europe-west1|[a-z0-9-]+)\.run\.app$/.test(origin);
+      const isLocalhost = /^http:\/\/localhost(?::\d+)?$/.test(origin);
+      const isAiStudio = origin === 'https://ai.studio' || origin === 'https://aistudio.google.com' || origin.endsWith('.google.com');
+      const isAllowedCustom = allowedOrigins.includes(origin);
+
+      if (isCloudRun || isLocalhost || isAiStudio || isAllowedCustom || process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
+      return callback(new Error('Blocked by CORS policy'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  }));
+
+  // 3. Payload Size Protection (1MB threshold against Memory DoS)
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
   // --- API Routes FIRST ---
 
@@ -262,10 +317,10 @@ async function startServer() {
     });
   });
 
-  // Public Site Data (includes leads and private requests ONLY for verified admins)
+  // Public Site Data (hydrated from Supabase primary or local fallback)
   app.get('/api/site-data', async (req, res) => {
     try {
-      const db = getDatabase();
+      const db = await getSiteDataAsync();
       const isAdmin = await checkIsAdmin(req);
 
       // Omit private passkey and sensitive security data from public response
@@ -298,9 +353,9 @@ async function startServer() {
   });
 
   // Get specific service by slug
-  app.get('/api/services/:slug', (req, res) => {
+  app.get('/api/services/:slug', async (req, res) => {
     try {
-      const db = getDatabase();
+      const db = await getSiteDataAsync();
       const service = db.services.find(s => s.slug === req.params.slug);
       if (!service) {
         res.status(404).json({ error: 'Service not found' });
@@ -316,7 +371,7 @@ async function startServer() {
     }
   });
 
-  // Submit Project Request Lead
+  // Submit Project Request Lead with Sanitization & Supabase Primary Storage
   app.post('/api/leads', async (req, res) => {
     try {
       const clientIp = req.ip || req.headers['x-forwarded-for']?.toString() || 'client';
@@ -347,65 +402,43 @@ async function startServer() {
         fileType
       } = req.body;
 
-      if (!fullName || !email || !serviceRequired || !projectDescription) {
-        res.status(400).json({ error: 'Please provide full name, email, service required, and project description' });
+      // Sanitization & Validation
+      const cleanName = stripHtml(fullName, 100);
+      const emailValidation = validateEmail(email);
+      const cleanService = stripHtml(serviceRequired, 150);
+      const cleanDesc = sanitizeText(projectDescription, 5000);
+
+      if (!cleanName || !emailValidation.valid || !cleanService || !cleanDesc) {
+        res.status(400).json({
+          error: emailValidation.error || 'Please provide full name, a valid email address, service required, and project description'
+        });
         return;
       }
 
-      const fileValidation = validateFile(fileName, fileType);
+      const fileValidation = validateFile(fileName, fileType, fileSize);
       if (!fileValidation.valid) {
         res.status(400).json({ error: fileValidation.error });
         return;
       }
 
-      const createdLead = addLead({
-        fullName: String(fullName).trim(),
-        email: String(email).trim().toLowerCase(),
-        phone: String(phone || '').trim(),
-        whatsapp: String(whatsapp || '').trim(),
-        country: String(country || 'Not specified').trim(),
-        serviceRequired: String(serviceRequired).trim(),
-        projectDescription: String(projectDescription).trim(),
-        referenceRequirements: String(referenceRequirements || '').trim(),
-        budget: String(budget || 'Negotiable').trim(),
-        deadline: String(deadline || 'Flexible').trim(),
-        preferredContactMethod: String(preferredContactMethod || 'Email').trim(),
+      const createdLead = await addLeadAsync({
+        fullName: cleanName,
+        email: emailValidation.normalized,
+        phone: sanitizePhone(phone),
+        whatsapp: sanitizePhone(whatsapp),
+        country: stripHtml(country || 'Not specified', 60),
+        serviceRequired: cleanService,
+        projectDescription: cleanDesc,
+        referenceRequirements: sanitizeText(referenceRequirements || '', 2000),
+        budget: stripHtml(budget || 'Negotiable', 60),
+        deadline: stripHtml(deadline || 'Flexible', 60),
+        preferredContactMethod: stripHtml(preferredContactMethod || 'Email', 40),
         platformPreference: platformPreference === 'Fiverr' || platformPreference === 'Upwork' ? platformPreference : 'Direct',
-        fileName: fileName ? String(fileName) : undefined,
-        fileUrl: fileUrl ? String(fileUrl) : undefined,
-        fileSize: fileSize ? String(fileSize) : undefined,
-        fileType: fileType ? String(fileType) : undefined
+        fileName: fileName ? stripHtml(fileName, 150) : undefined,
+        fileUrl: fileUrl ? sanitizeText(fileUrl, 500) : undefined,
+        fileSize: fileSize ? stripHtml(String(fileSize), 50) : undefined,
+        fileType: fileType ? stripHtml(String(fileType), 80) : undefined
       });
-
-      // Sync lead to Supabase if available
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('leads').insert([{
-            id: createdLead.id,
-            full_name: createdLead.fullName,
-            email: createdLead.email,
-            phone: createdLead.phone,
-            whatsapp: createdLead.whatsapp,
-            country: createdLead.country,
-            service_required: createdLead.serviceRequired,
-            project_description: createdLead.projectDescription,
-            reference_requirements: createdLead.referenceRequirements,
-            budget: createdLead.budget,
-            deadline: createdLead.deadline,
-            preferred_contact_method: createdLead.preferredContactMethod,
-            platform_preference: createdLead.platformPreference,
-            file_name: createdLead.fileName,
-            file_url: createdLead.fileUrl,
-            file_size: createdLead.fileSize,
-            file_type: createdLead.fileType,
-            status: createdLead.status,
-            created_at: createdLead.createdAt
-          }]);
-        } catch (supaErr) {
-          console.warn('Supabase lead sync notice:', supaErr);
-        }
-      }
 
       res.status(201).json({
         success: true,
@@ -417,7 +450,7 @@ async function startServer() {
     }
   });
 
-  // Submit Custom Website Upgrade Request
+  // Submit Custom Website Upgrade Request with Sanitization & Supabase Primary Storage
   app.post('/api/custom-website-requests', async (req, res) => {
     try {
       const clientIp = req.ip || req.headers['x-forwarded-for']?.toString() || 'client';
@@ -443,78 +476,36 @@ async function startServer() {
         additionalRequirements
       } = req.body;
 
-      if (!fullName || !email) {
-        res.status(400).json({ error: 'Please provide at least your Name and Email.' });
+      const cleanName = stripHtml(fullName, 100);
+      const emailValidation = validateEmail(email);
+
+      if (!cleanName || !emailValidation.valid) {
+        res.status(400).json({ error: emailValidation.error || 'Please provide valid Name and Email.' });
         return;
       }
 
-      const servicesArray = Array.isArray(requiredServices)
-        ? requiredServices
-        : requiredServices ? [String(requiredServices)] : ['Modern Web & UI Development'];
+      const servicesArray = sanitizeStringArray(requiredServices, 20, 100);
+      const featuresArray = sanitizeStringArray(requiredFeatures, 30, 100);
 
-      const featuresArray = Array.isArray(requiredFeatures)
-        ? requiredFeatures
-        : requiredFeatures ? [String(requiredFeatures)] : [];
-
-      const newRequest = addCustomWebsiteRequest({
-        fullName: String(fullName).trim(),
-        email: String(email).trim().toLowerCase(),
-        whatsapp: String(whatsapp || '').trim(),
-        businessName: String(businessName || '').trim(),
-        websiteType: String(websiteType || 'Custom Business Website').trim(),
-        requiredServices: servicesArray,
-        designPreference: String(designPreference || 'Modern Tech & Minimalist').trim(),
+      const newRequest = await addCustomWebsiteRequestAsync({
+        fullName: cleanName,
+        email: emailValidation.normalized,
+        whatsapp: sanitizePhone(whatsapp),
+        businessName: stripHtml(businessName || '', 120),
+        websiteType: stripHtml(websiteType || 'Custom Business Website', 100),
+        requiredServices: servicesArray.length > 0 ? servicesArray : ['Modern Web & UI Development'],
+        designPreference: stripHtml(designPreference || 'Modern Tech & Minimalist', 100),
         requiredFeatures: featuresArray,
-        budget: String(budget || 'Custom Quote').trim(),
-        deadline: String(deadline || 'Flexible').trim(),
-        additionalRequirements: String(additionalRequirements || '').trim(),
+        budget: stripHtml(budget || 'Custom Quote', 60),
+        deadline: stripHtml(deadline || 'Flexible', 60),
+        additionalRequirements: sanitizeText(additionalRequirements || '', 3000),
         status: 'NEW'
       });
-
-      // Save to Supabase if configured
-      let supabaseSynced = false;
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          const { error: sbError } = await supabase
-            .from('custom_website_requests')
-            .insert([{
-              id: newRequest.id,
-              full_name: newRequest.fullName,
-              email: newRequest.email,
-              whatsapp: newRequest.whatsapp,
-              business_name: newRequest.businessName,
-              website_type: newRequest.websiteType,
-              required_services: newRequest.requiredServices,
-              design_preference: newRequest.designPreference,
-              required_features: newRequest.requiredFeatures,
-              budget: newRequest.budget,
-              deadline: newRequest.deadline,
-              additional_requirements: newRequest.additionalRequirements,
-              status: newRequest.status,
-              created_at: newRequest.createdAt
-            }]);
-
-          if (!sbError) {
-            supabaseSynced = true;
-            newRequest.supabaseSynced = true;
-            const db = getDatabase();
-            const target = db.customRequests?.find(r => r.id === newRequest.id);
-            if (target) {
-              target.supabaseSynced = true;
-              saveDatabase(db);
-            }
-          }
-        } catch (sbErr: any) {
-          console.warn('Supabase sync notice:', sbErr.message);
-        }
-      }
 
       res.status(201).json({
         success: true,
         message: 'Your custom website requirements have been submitted successfully! Engr. Imran Khan will review your specifications and contact you promptly.',
-        request: newRequest,
-        supabaseSynced
+        request: newRequest
       });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to submit custom website request', details: err?.message });
@@ -534,34 +525,23 @@ async function startServer() {
       }
 
       const { name, email, subject, message } = req.body;
-      if (!name || !email || !message) {
-        res.status(400).json({ error: 'Name, email, and message are required' });
+      const cleanName = stripHtml(name, 100);
+      const emailValidation = validateEmail(email);
+      const cleanMsg = sanitizeText(message, 3000);
+
+      if (!cleanName || !emailValidation.valid || !cleanMsg) {
+        res.status(400).json({
+          error: emailValidation.error || 'Name, a valid email address, and a message are required'
+        });
         return;
       }
 
-      const newMsg = addContactMessage({
-        name: String(name).trim(),
-        email: String(email).trim().toLowerCase(),
-        subject: String(subject || 'General Inquiry').trim(),
-        message: String(message).trim()
+      const newMsg = await addContactMessageAsync({
+        name: cleanName,
+        email: emailValidation.normalized,
+        subject: stripHtml(subject || 'General Inquiry', 150),
+        message: cleanMsg
       });
-
-      // Sync message to Supabase
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('contact_messages').insert([{
-            id: newMsg.id,
-            name: newMsg.name,
-            email: newMsg.email,
-            subject: newMsg.subject,
-            message: newMsg.message,
-            created_at: newMsg.createdAt
-          }]);
-        } catch (supaErr) {
-          console.warn('Supabase contact message sync notice:', supaErr);
-        }
-      }
 
       res.status(201).json({
         success: true,
@@ -606,90 +586,53 @@ async function startServer() {
         fileAttachment
       } = req.body;
 
-      if (!fullName || !email) {
-        res.status(400).json({ error: 'Please provide at least your Full Name and Email address.' });
+      const cleanName = stripHtml(fullName, 100);
+      const emailValidation = validateEmail(email);
+
+      if (!cleanName || !emailValidation.valid) {
+        res.status(400).json({ error: emailValidation.error || 'Please provide Full Name and a valid Email address.' });
         return;
       }
 
       if (fileAttachment) {
-        const fileCheck = validateFile(fileAttachment.fileName, fileAttachment.fileType);
+        const fileCheck = validateFile(fileAttachment.fileName, fileAttachment.fileType, fileAttachment.fileSize);
         if (!fileCheck.valid) {
           res.status(400).json({ error: fileCheck.error });
           return;
         }
       }
 
-      // Add to server database
-      const newRequest = addTeachingRequest({
-        fullName: String(fullName).trim(),
-        email: String(email).trim().toLowerCase(),
-        whatsapp: String(whatsapp || '').trim(),
-        country: String(country || 'Pakistan').trim(),
-        userRole: userRole || 'Teacher',
-        subject: String(subject || 'General / STEM').trim(),
-        studentLevel: String(studentLevel || 'Beginner / General').trim(),
-        topic: String(topic || 'Custom Subject Matter').trim(),
-        courseOrModule: String(courseOrModule || '').trim(),
-        requiredServiceId: String(requiredServiceId || 'ts-custom').trim(),
-        requiredServiceName: String(requiredServiceName || (isCustomRequest ? 'Custom Educational Inquiry' : 'Teaching Support')).trim(),
-        numberOfLessons: String(numberOfLessons || '1-3 Lessons').trim(),
-        requiredFormat: String(requiredFormat || 'Editable Word / Google Docs & PDF').trim(),
-        deadline: String(deadline || 'Flexible').trim(),
-        budget: String(budget || 'Standard Fee').trim(),
-        additionalRequirements: String(additionalRequirements || '').trim(),
+      const newRequest = await addTeachingRequestAsync({
+        fullName: cleanName,
+        email: emailValidation.normalized,
+        whatsapp: sanitizePhone(whatsapp),
+        country: stripHtml(country || 'Pakistan', 60),
+        userRole: userRole === 'Student' || userRole === 'Parent' || userRole === 'Institution' ? userRole : 'Teacher',
+        subject: stripHtml(subject || 'General / STEM', 100),
+        studentLevel: stripHtml(studentLevel || 'Beginner / General', 60),
+        topic: stripHtml(topic || 'Custom Subject Matter', 150),
+        courseOrModule: stripHtml(courseOrModule || '', 100),
+        requiredServiceId: stripHtml(requiredServiceId || 'ts-custom', 60),
+        requiredServiceName: stripHtml(requiredServiceName || (isCustomRequest ? 'Custom Educational Inquiry' : 'Teaching Support'), 150),
+        numberOfLessons: stripHtml(numberOfLessons || '1-3 Lessons', 60),
+        requiredFormat: stripHtml(requiredFormat || 'Editable Word / Google Docs & PDF', 100),
+        deadline: stripHtml(deadline || 'Flexible', 60),
+        budget: stripHtml(budget || 'Standard Fee', 60),
+        additionalRequirements: sanitizeText(additionalRequirements || '', 3000),
         isCustomRequest: Boolean(isCustomRequest),
         fileAttachment: fileAttachment && typeof fileAttachment === 'object' ? {
-          fileName: String(fileAttachment.fileName || 'document'),
-          fileSize: fileAttachment.fileSize ? String(fileAttachment.fileSize) : undefined,
-          fileType: fileAttachment.fileType ? String(fileAttachment.fileType) : undefined,
-          fileUrl: fileAttachment.fileUrl ? String(fileAttachment.fileUrl) : undefined,
-          storagePath: fileAttachment.storagePath ? String(fileAttachment.storagePath) : undefined,
-          dataUrl: fileAttachment.dataUrl ? String(fileAttachment.dataUrl) : undefined
+          fileName: stripHtml(fileAttachment.fileName || 'document', 150),
+          fileSize: fileAttachment.fileSize ? stripHtml(String(fileAttachment.fileSize), 40) : undefined,
+          fileType: fileAttachment.fileType ? stripHtml(String(fileAttachment.fileType), 80) : undefined,
+          fileUrl: fileAttachment.fileUrl ? sanitizeText(fileAttachment.fileUrl, 500) : undefined,
+          storagePath: fileAttachment.storagePath ? stripHtml(fileAttachment.storagePath, 250) : undefined
         } : undefined,
         status: 'NEW'
       });
 
-      // Try syncing to Supabase if credentials exist
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('teaching_requests').insert([
-            {
-              id: newRequest.id,
-              full_name: newRequest.fullName,
-              email: newRequest.email,
-              whatsapp: newRequest.whatsapp,
-              country: newRequest.country,
-              user_role: newRequest.userRole,
-              subject: newRequest.subject,
-              student_level: newRequest.studentLevel,
-              topic: newRequest.topic,
-              course_module: newRequest.courseOrModule,
-              required_service_id: newRequest.requiredServiceId,
-              required_service_name: newRequest.requiredServiceName,
-              number_of_lessons: newRequest.numberOfLessons,
-              required_format: newRequest.requiredFormat,
-              deadline: newRequest.deadline,
-              budget: newRequest.budget,
-              additional_requirements: newRequest.additionalRequirements,
-              is_custom: newRequest.isCustomRequest,
-              file_name: newRequest.fileAttachment?.fileName,
-              file_url: newRequest.fileAttachment?.fileUrl,
-              file_size: newRequest.fileAttachment?.fileSize,
-              file_type: newRequest.fileAttachment?.fileType,
-              status: newRequest.status,
-              created_at: newRequest.createdAt
-            }
-          ]);
-          newRequest.supabaseSynced = true;
-        } catch (supaErr) {
-          console.warn('Supabase sync notice for teaching request:', supaErr);
-        }
-      }
-
       res.status(201).json({
         success: true,
-        message: 'Your teaching service inquiry has been received! Engr. Imran Khan will review your requirements and follow up with a structured plan and timeline.',
+        message: 'Your teaching request has been submitted successfully! Engr. Imran Khan will review your requirements and respond promptly.',
         request: newRequest
       });
     } catch (err: any) {
@@ -701,7 +644,7 @@ async function startServer() {
   // SECURE AUTHENTICATION ROUTES
   // ==============================================================================
 
-  // Supabase Auth Token verification / exchange endpoint
+  // Supabase Auth Token verification / exchange endpoint (Returns cryptographic JWT)
   app.post('/api/admin/verify-supabase', async (req, res) => {
     try {
       const { accessToken } = req.body;
@@ -716,10 +659,10 @@ async function startServer() {
         return;
       }
 
-      const sessionToken = createSession('supabase', user.id, user.email);
+      // Return the verified Supabase JWT so the client stores it directly for stateless authentication
       res.json({
         success: true,
-        token: sessionToken,
+        token: accessToken,
         user: {
           id: user.id,
           email: user.email
@@ -732,6 +675,7 @@ async function startServer() {
   });
 
   // Admin Master Passkey Authentication with Brute-Force Rate Limiting
+  // Strictly requires non-empty ADMIN_PASSKEY in environment variables
   app.post('/api/admin/login', (req, res) => {
     try {
       const clientIp = req.ip || req.headers['x-forwarded-for']?.toString() || 'client';
@@ -750,12 +694,12 @@ async function startServer() {
         return;
       }
 
-      // Check environment variable first, then fallback to db setting
-      const db = getDatabase();
-      const expectedPasskey = process.env.ADMIN_PASSKEY || db.settings.adminPasskey;
-
+      // Enforce non-empty process.env.ADMIN_PASSKEY, rejecting login attempts if unconfigured
+      const expectedPasskey = (process.env.ADMIN_PASSKEY || '').trim();
       if (!expectedPasskey) {
-        res.status(401).json({ error: 'No admin passkey configured on the server. Please sign in via Supabase Auth.' });
+        res.status(401).json({
+          error: 'Passkey authentication is disabled because ADMIN_PASSKEY is not configured in the server environment. Please sign in via Supabase Auth.'
+        });
         return;
       }
 
@@ -795,10 +739,10 @@ async function startServer() {
     res.json({ success: true, message: 'Logged out successfully' });
   });
 
-  // Protected Admin Data endpoint
-  app.get('/api/admin/data', adminAuthMiddleware, (req, res) => {
+  // Protected Admin Data endpoint (Fetches fresh data with Supabase primary)
+  app.get('/api/admin/data', adminAuthMiddleware, async (req, res) => {
     try {
-      const db = getDatabase();
+      const db = await getSiteDataAsync(true);
       const { adminPasskey, ...safeSettings } = db.settings;
       res.json({
         ...db,
@@ -817,37 +761,7 @@ async function startServer() {
         res.status(400).json({ error: 'Service ID and name are required' });
         return;
       }
-      const updated = updateService(service);
-
-      // Sync to Supabase if available
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('services').upsert({
-            id: updated.id,
-            name: updated.name,
-            slug: updated.slug,
-            category: updated.category,
-            short_description: updated.shortDescription,
-            problem: updated.problem,
-            solution: updated.solution,
-            included_features: updated.includedFeatures,
-            tools: updated.tools,
-            pricing_model: updated.pricingModel || updated.pricingType || 'starting_at',
-            starting_price: updated.startingPrice,
-            estimated_delivery: updated.estimatedDelivery,
-            portfolio_examples: updated.portfolioExamples,
-            process: updated.process,
-            faqs: updated.faqs,
-            icon_name: updated.iconName,
-            featured: updated.featured ?? false,
-            updated_at: new Date().toISOString()
-          });
-        } catch (supaErr) {
-          console.warn('Supabase service update notice:', supaErr);
-        }
-      }
-
+      const updated = await updateServiceAsync(service);
       res.json({ success: true, service: updated });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to update service', details: err?.message });
@@ -862,37 +776,7 @@ async function startServer() {
         res.status(400).json({ error: 'Project ID and title are required' });
         return;
       }
-      const updated = updateProject(project);
-
-      // Sync to Supabase if available
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('projects').upsert({
-            id: updated.id,
-            title: updated.title,
-            category: updated.category,
-            role: updated.role,
-            technologies: updated.technologies,
-            tools: updated.tools,
-            description: updated.description,
-            problem: updated.problem,
-            solution: updated.solution,
-            project_type: updated.projectType,
-            images: updated.images,
-            live_url: updated.liveUrl,
-            github_url: updated.githubUrl,
-            fiverr_url: updated.fiverrUrl,
-            upwork_url: updated.upworkUrl,
-            featured: updated.featured,
-            date: updated.date,
-            updated_at: new Date().toISOString()
-          });
-        } catch (supaErr) {
-          console.warn('Supabase project update notice:', supaErr);
-        }
-      }
-
+      const updated = await updateProjectAsync(project);
       res.json({ success: true, project: updated });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to update project', details: err?.message });
@@ -916,25 +800,11 @@ async function startServer() {
         res.status(400).json({ error: 'Invalid lead status' });
         return;
       }
-      const updatedLead = updateLeadStatus(id, status, adminNotes);
+      const updatedLead = await updateLeadStatusAsync(id, status, adminNotes ? sanitizeText(adminNotes, 2000) : undefined);
       if (!updatedLead) {
         res.status(404).json({ error: 'Lead not found' });
         return;
       }
-
-      // Sync to Supabase if available
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('leads').update({
-            status,
-            admin_notes: adminNotes
-          }).eq('id', id);
-        } catch (supaErr) {
-          console.warn('Supabase lead status update notice:', supaErr);
-        }
-      }
-
       res.json({ success: true, lead: updatedLead });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to update lead status', details: err?.message });
@@ -944,18 +814,7 @@ async function startServer() {
   // Delete Lead
   app.delete('/api/admin/leads/:id', adminAuthMiddleware, async (req, res) => {
     try {
-      const success = deleteLead(req.params.id);
-
-      // Sync delete to Supabase if available
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('leads').delete().eq('id', req.params.id);
-        } catch (supaErr) {
-          console.warn('Supabase lead delete notice:', supaErr);
-        }
-      }
-
+      const success = await deleteLeadAsync(req.params.id);
       res.json({ success });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to delete lead', details: err?.message });
@@ -979,25 +838,11 @@ async function startServer() {
         res.status(400).json({ error: 'Invalid custom request status' });
         return;
       }
-      const updated = updateCustomWebsiteRequestStatus(id, status, adminNotes);
+      const updated = await updateCustomWebsiteRequestStatusAsync(id, status, adminNotes ? sanitizeText(adminNotes, 2000) : undefined);
       if (!updated) {
         res.status(404).json({ error: 'Custom request not found' });
         return;
       }
-
-      // Sync to Supabase
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('custom_website_requests').update({
-            status,
-            admin_notes: adminNotes
-          }).eq('id', id);
-        } catch (supaErr) {
-          console.warn('Supabase custom request update notice:', supaErr);
-        }
-      }
-
       res.json({ success: true, request: updated });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to update custom request status', details: err?.message });
@@ -1007,15 +852,7 @@ async function startServer() {
   // Delete Custom Website Request
   app.delete('/api/admin/custom-requests/:id', adminAuthMiddleware, async (req, res) => {
     try {
-      const success = deleteCustomWebsiteRequest(req.params.id);
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('custom_website_requests').delete().eq('id', req.params.id);
-        } catch (supaErr) {
-          console.warn('Supabase custom request delete notice:', supaErr);
-        }
-      }
+      const success = await deleteCustomWebsiteRequestAsync(req.params.id);
       res.json({ success });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to delete custom request', details: err?.message });
@@ -1060,42 +897,10 @@ async function startServer() {
     }
   });
 
-  // Update Settings
+  // Update Settings (Brand, Position, Hero, Toggles)
   app.post('/api/admin/settings', adminAuthMiddleware, async (req, res) => {
     try {
-      const updated = updateSettings(req.body);
-
-      // Sync to Supabase
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('site_settings').upsert({
-            id: 'current',
-            brand_name: updated.brandName,
-            professional_name: updated.professionalName,
-            positioning: updated.positioning,
-            brand_concept: updated.brandConcept,
-            hero_heading: updated.heroHeading,
-            hero_supporting: updated.heroSupporting,
-            hero_description: updated.heroDescription,
-            email: updated.email,
-            whatsapp: updated.whatsapp,
-            location: updated.location,
-            demo_mode: updated.demoMode,
-            show_pricing: updated.showPricing,
-            show_services: updated.showServices,
-            show_features: updated.showFeatures,
-            cta_title: updated.ctaTitle,
-            cta_supporting_text: updated.ctaSupportingText,
-            upgrade_message: updated.upgradeMessage,
-            premium_features: updated.premiumFeatures,
-            updated_at: new Date().toISOString()
-          });
-        } catch (supaErr) {
-          console.warn('Supabase settings update notice:', supaErr);
-        }
-      }
-
+      const updated = await updateSettingsAsync(req.body);
       const { adminPasskey, ...safeSettings } = updated;
       res.json({ success: true, settings: safeSettings });
     } catch (err: any) {
@@ -1122,25 +927,11 @@ async function startServer() {
         res.status(400).json({ error: 'Invalid teaching request status' });
         return;
       }
-      const updated = updateTeachingRequestStatus(id, status, adminNotes);
+      const updated = await updateTeachingRequestStatusAsync(id, status, adminNotes ? sanitizeText(adminNotes, 2000) : undefined);
       if (!updated) {
         res.status(404).json({ error: 'Teaching request not found' });
         return;
       }
-
-      // Sync to Supabase
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('teaching_requests').update({
-            status,
-            admin_notes: adminNotes
-          }).eq('id', id);
-        } catch (supaErr) {
-          console.warn('Supabase teaching request update notice:', supaErr);
-        }
-      }
-
       res.json({ success: true, request: updated });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to update teaching request status', details: err?.message });
@@ -1150,15 +941,7 @@ async function startServer() {
   // Delete Teaching Request
   app.delete('/api/admin/teaching-requests/:id', adminAuthMiddleware, async (req, res) => {
     try {
-      const success = deleteTeachingRequest(req.params.id);
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('teaching_requests').delete().eq('id', req.params.id);
-        } catch (supaErr) {
-          console.warn('Supabase teaching request delete notice:', supaErr);
-        }
-      }
+      const success = await deleteTeachingRequestAsync(req.params.id);
       res.json({ success });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to delete teaching request', details: err?.message });
@@ -1173,41 +956,7 @@ async function startServer() {
         res.status(400).json({ error: 'Teaching service ID and title are required' });
         return;
       }
-      const saved = saveTeachingService(service);
-
-      // Sync to Supabase
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('teaching_services').upsert({
-            id: saved.id,
-            title: saved.title,
-            slug: saved.slug,
-            category: saved.category,
-            subtitle: saved.subtitle,
-            short_description: saved.shortDescription,
-            description: saved.description,
-            who_is_this_for: saved.whoIsThisFor,
-            sub_offerings: saved.subOfferings,
-            what_is_included: saved.whatIsIncluded,
-            deliverables: saved.deliverables,
-            sample_preview: saved.samplePreview,
-            process: saved.process,
-            faqs: saved.faqs,
-            pricing_type: saved.pricingType,
-            starting_price: saved.startingPrice,
-            premium_price: saved.premiumPrice,
-            delivery_time: saved.deliveryTime,
-            icon: saved.icon,
-            enabled: saved.enabled,
-            order_index: saved.order,
-            updated_at: new Date().toISOString()
-          });
-        } catch (supaErr) {
-          console.warn('Supabase teaching service update notice:', supaErr);
-        }
-      }
-
+      const saved = await saveTeachingServiceAsync(service);
       res.json({ success: true, service: saved });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to save teaching service', details: err?.message });
@@ -1217,15 +966,7 @@ async function startServer() {
   // Delete Teaching Service
   app.delete('/api/admin/teaching-services/:id', adminAuthMiddleware, async (req, res) => {
     try {
-      const success = deleteTeachingService(req.params.id);
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('teaching_services').delete().eq('id', req.params.id);
-        } catch (supaErr) {
-          console.warn('Supabase teaching service delete notice:', supaErr);
-        }
-      }
+      const success = await deleteTeachingServiceAsync(req.params.id);
       res.json({ success });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to delete teaching service', details: err?.message });
@@ -1240,27 +981,7 @@ async function startServer() {
         res.status(400).json({ error: 'Valid consultation settings object required' });
         return;
       }
-      const updated = updateTeachingConsultation(settings);
-
-      const supabase = getServerSupabase();
-      if (supabase) {
-        try {
-          await supabase.from('teaching_consultation').upsert({
-            id: 'current',
-            title: updated.title,
-            headline: updated.headline,
-            subtext: updated.subtext,
-            price: updated.price,
-            duration: updated.duration,
-            topics: updated.topics,
-            enabled: updated.enabled,
-            updated_at: new Date().toISOString()
-          });
-        } catch (supaErr) {
-          console.warn('Supabase consultation update notice:', supaErr);
-        }
-      }
-
+      const updated = await updateTeachingConsultationAsync(settings);
       res.json({ success: true, consultation: updated });
     } catch (err: any) {
       res.status(500).json({ error: 'Failed to update consultation settings', details: err?.message });
@@ -1270,7 +991,7 @@ async function startServer() {
   // Sync / Migrate all data to Supabase
   app.post('/api/admin/sync-supabase', adminAuthMiddleware, async (req, res) => {
     try {
-      const db = getDatabase();
+      const db = await getSiteDataAsync();
       const result = await syncDatabaseToSupabase(db);
       if (!result.success) {
         res.status(400).json(result);
@@ -1286,7 +1007,7 @@ async function startServer() {
   app.post('/api/admin/reset', adminAuthMiddleware, async (req, res) => {
     try {
       const reset = resetToDefaults();
-      // Also sync reset to Supabase if configured
+      // Sync reset to Supabase if configured
       await syncDatabaseToSupabase(reset);
       const { adminPasskey, ...safeSettings } = reset.settings;
       res.json({ success: true, data: { ...reset, settings: safeSettings } });

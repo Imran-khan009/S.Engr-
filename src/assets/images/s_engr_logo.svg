@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%" fill="none">
+  <!-- Dark Charcoal Canvas Backdrop -->
+  <rect width="500" height="500" rx="32" fill="#212224"/>
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&amp;family=Montserrat:wght@400;500;600;700&amp;display=swap');
+      .serif-monogram {
+        font-family: 'Cinzel', 'Playfair Display', 'Didot', 'Bodoni MT', 'Times New Roman', serif;
+        font-weight: 700;
+        fill: #F4F3F0;
+      }
+      .brand-title {
+        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 600;
+        fill: #F4F3F0;
+        letter-spacing: 0.38em;
+      }
+      .brand-sub {
+        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 500;
+        fill: #BEBDBA;
+        letter-spacing: 0.42em;
+      }
+    </style>
+  </defs>
+
+  <!-- Large Roman Serif Monogram 'I' and 'K' -->
+  <g class="serif-monogram">
+    <!-- Letter I -->
+    <text x="175" y="295" font-size="160" text-anchor="middle">I</text>
+    <!-- Letter K -->
+    <text x="325" y="295" font-size="160" text-anchor="middle">K</text>
+  </g>
+
+  <!-- Vertical Divider with Diamond Endpoints -->
+  <g stroke="#BEBDBA" stroke-width="1.75">
+    <line x1="250" y1="140" x2="250" y2="215" />
+    <line x1="250" y1="265" x2="250" y2="340" />
+    <!-- Diamond Top -->
+    <polygon points="250,135 253.5,140 250,145 246.5,140" fill="#BEBDBA" />
+    <!-- Diamond Bottom -->
+    <polygon points="250,335 253.5,340 250,345 246.5,340" fill="#BEBDBA" />
+  </g>
+
+  <!-- S • ENGR Banner across middle -->
+  <rect x="150" y="222" width="200" height="34" fill="#212224" />
+  <text x="254" y="244" font-size="20" text-anchor="middle" class="brand-title">S • ENGR</text>
+
+  <!-- Technology & Engineering Subtitle -->
+  <text x="252" y="388" font-size="11" text-anchor="middle" class="brand-sub">TECHNOLOGY &amp; ENGINEERING</text>
+</svg>

@@ -6,7 +6,8 @@ export type ServiceCategory =
   | 'Digital Marketing & Ads'
   | 'Video Editing'
   | 'Excel & Data Services'
-  | 'Construction & Design';
+  | 'Construction & Design'
+  | 'Education & Mentorship';
 
 export type PricingModel = 
   | 'Fixed Price'
@@ -62,7 +63,34 @@ export interface Project {
   upworkUrl?: string;
   featured: boolean;
   date: string;
+  keyMetric?: string;
   verifiedNotes?: string;
+}
+
+export interface Testimonial {
+  id: string;
+  clientName: string;
+  role: string;
+  company?: string;
+  platform: 'Upwork' | 'Fiverr' | 'Direct';
+  rating: number;
+  feedback: string;
+  projectTitle?: string;
+  avatarUrl?: string;
+  verified: boolean;
+  date?: string;
+}
+
+export interface CredentialBadge {
+  id: string;
+  title: string;
+  type: 'Vocational / International Program' | 'Academic Degree' | 'Engineering Diploma' | 'Technical Certification';
+  organization: string;
+  verificationScope: string;
+  verificationBadge: string;
+  verificationUrl?: string;
+  credentialId?: string;
+  iconName?: string;
 }
 
 export interface ExperienceItem {
@@ -337,5 +365,7 @@ export interface FullSiteData {
   teachingRequests?: TeachingServiceRequest[];
   teachingConsultation?: TeachingConsultationSettings;
   teachingProducts?: TeachingDigitalProduct[];
+  testimonials?: Testimonial[];
+  credentials?: CredentialBadge[];
 }
 

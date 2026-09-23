@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Service, Lead } from '../types';
-import { X, Send, CheckCircle2, AlertCircle, Upload, ShieldCheck, Clock, DollarSign, FileText } from 'lucide-react';
+import { X, Send, CheckCircle2, AlertCircle, Upload, ShieldCheck, Clock, DollarSign, FileText, Calendar, Video, ExternalLink, Sparkles } from 'lucide-react';
+import { WhatsAppIcon } from './SocialIcons';
 import { uploadToStorageOrFallback, validateAttachmentFile } from '../lib/storage';
 
 interface ProjectRequestModalProps {
@@ -19,6 +20,11 @@ export const ProjectRequestModal: React.FC<ProjectRequestModalProps> = ({
   onLeadSubmitted
 }) => {
   if (!isOpen) return null;
+
+  const [activeTab, setActiveTab] = useState<'INQUIRY' | 'CONSULTATION'>('INQUIRY');
+  const [selectedMeetingType, setSelectedMeetingType] = useState<'Google Meet' | 'WhatsApp Call' | 'Zoom'>('Google Meet');
+  const [selectedTopic, setSelectedTopic] = useState<string>('Custom Software Architecture & Web App');
+  const [consultationSubmitted, setConsultationSubmitted] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -152,10 +158,10 @@ export const ProjectRequestModal: React.FC<ProjectRequestModalProps> = ({
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60 sticky top-0 z-20">
           <div>
             <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider block">
-              Direct Project Submission
+              Direct Engagement &amp; Consultation
             </span>
             <h2 className="text-lg font-bold text-white">
-              Request a Service or Consultation
+              Engage Engr. Imran Khan
             </h2>
           </div>
           <button
@@ -166,9 +172,174 @@ export const ProjectRequestModal: React.FC<ProjectRequestModalProps> = ({
           </button>
         </div>
 
+        {/* Tab Selector */}
+        <div className="px-6 pt-3 bg-slate-950/40 border-b border-slate-800 flex items-center space-x-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('INQUIRY')}
+            className={`px-4 py-2.5 rounded-t-xl text-xs font-mono font-bold tracking-wider transition-all flex items-center space-x-2 border-b-2 cursor-pointer ${
+              activeTab === 'INQUIRY'
+                ? 'border-orange-500 text-white bg-slate-900'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5 text-orange-400" />
+            <span>Submit Project Scope</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('CONSULTATION')}
+            className={`px-4 py-2.5 rounded-t-xl text-xs font-mono font-bold tracking-wider transition-all flex items-center space-x-2 border-b-2 cursor-pointer ${
+              activeTab === 'CONSULTATION'
+                ? 'border-cyan-400 text-white bg-slate-900'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Book 1-on-1 Consultation</span>
+          </button>
+        </div>
+
         {/* Content body */}
         <div className="p-6 sm:p-8 overflow-y-auto flex-1">
-          {submittedLead ? (
+          {activeTab === 'CONSULTATION' ? (
+            <div className="space-y-6">
+              {/* Consultation Intro Card */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-slate-900 to-orange-950/30 border border-cyan-800/40">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+                    <Video className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">
+                      Direct 1-on-1 Video / Audio Consultation
+                    </h3>
+                    <p className="text-xs text-slate-400 font-mono">
+                      Available via Google Meet, WhatsApp Audio/Video, or Zoom
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                  Schedule a focused session with Engr. Imran Khan to audit your software architecture, review IoT microcontroller schematics, map ad marketing funnels, or design vocational training programs.
+                </p>
+              </div>
+
+              {/* Instant Cal.com / Calendly Direct Booking Hub */}
+              <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-4 h-4 text-cyan-400" />
+                    <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                      Interactive Appointment Scheduler
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                    Live Slots Available
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-300">
+                  Select your preferred meeting platform and topic, or launch the automated booking calendar directly:
+                </p>
+
+                {/* Preferred Platform Selection */}
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-2">
+                    Preferred Meeting Platform:
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['Google Meet', 'WhatsApp Call', 'Zoom'] as const).map((platform) => (
+                      <button
+                        key={platform}
+                        type="button"
+                        onClick={() => setSelectedMeetingType(platform)}
+                        className={`p-3 rounded-xl border text-xs font-mono font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
+                          selectedMeetingType === platform
+                            ? 'bg-cyan-950/70 border-cyan-500 text-cyan-300'
+                            : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        <Video className="w-4 h-4" />
+                        <span>{platform}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Consultation Topic */}
+                <div>
+                  <label className="text-[11px] font-mono text-slate-400 block mb-2">
+                    Discussion Focus:
+                  </label>
+                  <select
+                    value={selectedTopic}
+                    onChange={(e) => setSelectedTopic(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Custom Software Architecture & Web App">Custom Software Architecture & Web App</option>
+                    <option value="IoT Circuit Prototyping & Sensor Telemetry">IoT Circuit Prototyping & Sensor Telemetry</option>
+                    <option value="Meta Ads Conversion Funnel & ROAS Audit">Meta Ads Conversion Funnel & ROAS Audit</option>
+                    <option value="Vocational Teaching / Corporate IoT Training">Vocational Teaching / Corporate IoT Training</option>
+                    <option value="Civil Engineering & 2D AutoCAD Consultation">Civil Engineering & 2D AutoCAD Consultation</option>
+                  </select>
+                </div>
+
+                {/* Direct Action Booking Buttons */}
+                <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                  <a
+                    id="cal-booking-link"
+                    href="https://cal.com/engr-imran-khan"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-cyan-400 to-blue-400 hover:from-cyan-300 hover:to-blue-300 transition-all shadow-md shadow-cyan-500/20 flex items-center justify-center space-x-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Open Cal.com Scheduler</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+
+                  <a
+                    id="whatsapp-consultation-link"
+                    href={`https://wa.me/923331244214?text=Assalam-o-Alaikum%20Engr.%20Imran,%20I%20would%20like%20to%20schedule%20a%201-on-1%20consultation%20via%20${encodeURIComponent(selectedMeetingType)}%20regarding%20${encodeURIComponent(selectedTopic)}.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                    <span>Confirm Slot on WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Consultation Features Strip */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div className="flex items-center space-x-2 text-cyan-400 font-mono font-bold mb-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>30–60 Min Deep Dive</span>
+                  </div>
+                  <p className="text-slate-400 text-[11px]">Structured agenda with actionable takeaways and technical notes.</p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div className="flex items-center space-x-2 text-emerald-400 font-mono font-bold mb-1">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Verified NDA Security</span>
+                  </div>
+                  <p className="text-slate-400 text-[11px]">Confidential discussion of proprietary IP and system blueprints.</p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div className="flex items-center space-x-2 text-orange-400 font-mono font-bold mb-1">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Milestone Credit</span>
+                  </div>
+                  <p className="text-slate-400 text-[11px]">Consultation fee is credited toward full project execution if hired.</p>
+                </div>
+              </div>
+            </div>
+          ) : submittedLead ? (
             <div className="text-center py-8">
               <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 mx-auto flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-8 h-8" />

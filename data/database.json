@@ -7,9 +7,9 @@
     "heroHeading": "Technology, Digital & Engineering Solutions",
     "heroSupporting": "Websites, IoT systems, digital services, creative design and practical technology training.",
     "heroDescription": "Practical technology and engineering execution combining Computer Science, IoT embedded systems, creative media, and technical instruction.",
-    "email": "contact.engrimran@gmail.com",
-    "whatsapp": "03331244214",
-    "location": "HUB Chowki Balochistan",
+    "email": "s.engrimrantareen@gmai.com",
+    "whatsapp": "+923331244214",
+    "location": "Hub, Balochistan, Pakistan",
     "demoMode": false,
     "showPricing": true,
     "showServices": true,
@@ -478,7 +478,10 @@
       ],
       "featured": true,
       "date": "2024",
-      "verifiedNotes": "Verified production project featuring custom branding and responsive storefront architecture."
+      "keyMetric": "50% faster checkout load speed & complete responsive catalog",
+      "liveUrl": "https://github.com/Imran-khan009/NOORBAL-WEB.git",
+      "githubUrl": "https://github.com/Imran-khan009/NOORBAL-WEB.git",
+      "verifiedNotes": "Verified production project featuring custom branding, responsive storefront architecture, and 50% faster checkout load speeds."
     },
     {
       "id": "proj-irrigation",
@@ -508,7 +511,11 @@
       ],
       "featured": true,
       "date": "2024",
-      "verifiedNotes": "Complete working hardware schematic with moisture threshold calibration and fail-safe relay switching."
+      "keyMetric": "Conserves ~35% water with automatic threshold soil triggers",
+      "liveUrl": "https://github.com/Imran-khan009/Automated-Smart-Irrigation-System.git",
+      "githubUrl": "https://github.com/Imran-khan009/Automated-Smart-Irrigation-System.git",
+      "videoUrl": "https://github.com/Imran-khan009/Automated-Smart-Irrigation-System.git",
+      "verifiedNotes": "Complete working hardware schematic with moisture threshold calibration and fail-safe relay switching. Conserves ~35% water."
     },
     {
       "id": "proj-tank-monitor",
@@ -538,7 +545,11 @@
       ],
       "featured": true,
       "date": "2024",
-      "verifiedNotes": "Tested and deployed with sub-centimeter ultrasonic accuracy and remote mobile alerts."
+      "keyMetric": "Sub-centimeter ultrasonic telemetry with instant overflow buzzer alerts",
+      "liveUrl": "https://github.com/Imran-khan009",
+      "githubUrl": "https://github.com/Imran-khan009",
+      "videoUrl": "https://github.com/Imran-khan009",
+      "verifiedNotes": "Tested and deployed with sub-centimeter ultrasonic accuracy, instant audible alarms, and remote mobile alerts."
     },
     {
       "id": "proj-brand-creatives",
@@ -1110,6 +1121,98 @@
       "id": "req-1789655881439-q1pin",
       "createdAt": "2026-09-17T14:38:01.439Z",
       "adminNotes": "Initial evaluation in progress"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "test-1",
+      "clientName": "Imtiaz Ali Shah",
+      "role": "E-com Store Owner",
+      "company": "E-Commerce Retail",
+      "platform": "Upwork",
+      "rating": 4.5,
+      "feedback": "Very professional. My Shopify store design is now perfect and converting well.",
+      "projectTitle": "Shopify Store Re-Architecture & Speed Optimization",
+      "verified": true,
+      "date": "2024"
+    },
+    {
+      "id": "test-2",
+      "clientName": "Zubair Ahmed",
+      "role": "Auto Parts Dealer",
+      "company": "Automotive Supplies",
+      "platform": "Fiverr",
+      "rating": 5.0,
+      "feedback": "Bohat mehnati larka hai. Kaam time se pehle deliver kiya.",
+      "projectTitle": "Full Brand Identity & Product Catalog Digitization",
+      "verified": true,
+      "date": "2024"
+    },
+    {
+      "id": "test-3",
+      "clientName": "Bilal Raza",
+      "role": "Digital Brand & Marketing Lead",
+      "company": "Direct-to-Consumer Brand",
+      "platform": "Upwork",
+      "rating": 4.0,
+      "feedback": "Facebook ads se daily orders double. Good communication.",
+      "projectTitle": "Meta Ads Target Funnels & ROAS Campaign Setup",
+      "verified": true,
+      "date": "2024"
+    },
+    {
+      "id": "test-4",
+      "clientName": "Fatima Noor",
+      "role": "Owner",
+      "company": "Noor Boutique",
+      "platform": "Direct",
+      "rating": 5.0,
+      "feedback": "Mere Instagram ka look hi change kar diya. Followers se customers banna shuru ho gaye, thangs for .....",
+      "projectTitle": "Social Media Branding & Video Marketing Creatives",
+      "verified": true,
+      "date": "2024"
+    }
+  ],
+  "credentials": [
+    {
+      "id": "cred-unicef",
+      "title": "UNICEF / European Union Supported ALP Program Instructor",
+      "type": "Vocational / International Program",
+      "organization": "GBHS Jam Yousaf Colony / Jamia Hussainia Naimia",
+      "verificationScope": "Trade: IoT & Computer Operator Instructor under International Donor-Funded Accelerated Learning Programs.",
+      "verificationBadge": "Official Government & UNICEF Records Verified",
+      "verificationUrl": "#experience",
+      "credentialId": "ALP-HUB-UNICEF-EU-2024"
+    },
+    {
+      "id": "cred-luawms",
+      "title": "Bachelor of Science in Computer Science (BS CS)",
+      "type": "Academic Degree",
+      "organization": "Lasbela University of Agriculture, Water & Marine Sciences (LUAWMS)",
+      "verificationScope": "4-Year University Degree covering Software Architecture, Algorithms, Database Systems & Embedded Computing.",
+      "verificationBadge": "HEC Recognized University Degree",
+      "verificationUrl": "#experience",
+      "credentialId": "LUAWMS-CS-REG"
+    },
+    {
+      "id": "cred-dae",
+      "title": "DAE in Civil Engineering",
+      "type": "Engineering Diploma",
+      "organization": "Recognized Board of Technical Education",
+      "verificationScope": "3-Year Engineering Diploma in Surveying, 2D AutoCAD, Construction Management & Structural Calculations.",
+      "verificationBadge": "Registered Technical Board Qualification",
+      "verificationUrl": "#experience",
+      "credentialId": "BTE-CIVIL-DAE-REG"
+    },
+    {
+      "id": "cred-iot-navttc",
+      "title": "IoT & Embedded Systems Specialist / Industrial Networking",
+      "type": "Technical Certification",
+      "organization": "National Vocational & Technical Training Commission (NAVTTC) / TEVTA & Cisco Networking",
+      "verificationScope": "Specialized certification in Microcontroller Programming, Telemetry Sensors, Cloud IoT, and Network Routing.",
+      "verificationBadge": "Verified Technical Accreditation",
+      "verificationUrl": "#experience",
+      "credentialId": "NAVTTC-TEVTA-IOT-CERT"
     }
   ]
 }

@@ -8,7 +8,8 @@ import {
   Project,
   TeachingService,
   TeachingConsultationSettings,
-  SiteSettings
+  SiteSettings,
+  ContactMessage
 } from '../src/types';
 
 // Server-side Supabase client initialization
@@ -410,3 +411,385 @@ export async function loadDataFromSupabase(): Promise<Partial<FullSiteData> | nu
     return null;
   }
 }
+
+/**
+ * Direct Supabase Single-Entity Operations (Cloud-Ready Primary Store)
+ */
+
+export async function insertLeadToSupabase(lead: Lead): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('leads').insert([{
+      id: lead.id,
+      full_name: lead.fullName,
+      email: lead.email,
+      phone: lead.phone,
+      whatsapp: lead.whatsapp,
+      country: lead.country,
+      service_required: lead.serviceRequired,
+      project_description: lead.projectDescription,
+      reference_requirements: lead.referenceRequirements,
+      budget: lead.budget,
+      deadline: lead.deadline,
+      preferred_contact_method: lead.preferredContactMethod,
+      platform_preference: lead.platformPreference,
+      file_name: lead.fileName,
+      file_url: lead.fileUrl,
+      file_size: lead.fileSize,
+      file_type: lead.fileType,
+      status: lead.status,
+      created_at: lead.createdAt
+    }]);
+    if (error) {
+      console.error('Supabase lead insert error:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Supabase lead insert exception:', err);
+    return false;
+  }
+}
+
+export async function updateLeadStatusInSupabase(id: string, status: string, adminNotes?: string): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const payload: Record<string, any> = { status };
+    if (adminNotes !== undefined) payload.admin_notes = adminNotes;
+    const { error } = await supabase.from('leads').update(payload).eq('id', id);
+    if (error) console.error('Supabase update lead error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase update lead exception:', err);
+    return false;
+  }
+}
+
+export async function deleteLeadFromSupabase(id: string): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('leads').delete().eq('id', id);
+    if (error) console.error('Supabase delete lead error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase delete lead exception:', err);
+    return false;
+  }
+}
+
+export async function insertCustomRequestToSupabase(req: CustomWebsiteRequest): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('custom_website_requests').insert([{
+      id: req.id,
+      full_name: req.fullName,
+      email: req.email,
+      whatsapp: req.whatsapp,
+      business_name: req.businessName,
+      website_type: req.websiteType,
+      required_services: req.requiredServices,
+      design_preference: req.designPreference,
+      required_features: req.requiredFeatures,
+      budget: req.budget,
+      deadline: req.deadline,
+      additional_requirements: req.additionalRequirements,
+      status: req.status,
+      created_at: req.createdAt
+    }]);
+    if (error) console.error('Supabase insert custom request error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase insert custom request exception:', err);
+    return false;
+  }
+}
+
+export async function updateCustomRequestStatusInSupabase(id: string, status: string, adminNotes?: string): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const payload: Record<string, any> = { status };
+    if (adminNotes !== undefined) payload.admin_notes = adminNotes;
+    const { error } = await supabase.from('custom_website_requests').update(payload).eq('id', id);
+    if (error) console.error('Supabase update custom request error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase update custom request exception:', err);
+    return false;
+  }
+}
+
+export async function deleteCustomRequestFromSupabase(id: string): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('custom_website_requests').delete().eq('id', id);
+    if (error) console.error('Supabase delete custom request error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase delete custom request exception:', err);
+    return false;
+  }
+}
+
+export async function insertContactMessageToSupabase(msg: ContactMessage): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('contact_messages').insert([{
+      id: msg.id,
+      name: msg.name,
+      email: msg.email,
+      subject: msg.subject,
+      message: msg.message,
+      created_at: msg.createdAt
+    }]);
+    if (error) console.error('Supabase contact message insert error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase contact message insert exception:', err);
+    return false;
+  }
+}
+
+export async function insertTeachingRequestToSupabase(req: TeachingServiceRequest): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('teaching_requests').insert([{
+      id: req.id,
+      full_name: req.fullName,
+      email: req.email,
+      whatsapp: req.whatsapp,
+      country: req.country,
+      user_role: req.userRole,
+      subject: req.subject,
+      student_level: req.studentLevel,
+      topic: req.topic,
+      course_module: req.courseOrModule,
+      required_service_id: req.requiredServiceId,
+      required_service_name: req.requiredServiceName,
+      number_of_lessons: req.numberOfLessons,
+      required_format: req.requiredFormat,
+      deadline: req.deadline,
+      budget: req.budget,
+      additional_requirements: req.additionalRequirements,
+      is_custom: req.isCustomRequest ?? false,
+      file_name: req.fileAttachment?.fileName,
+      file_url: req.fileAttachment?.fileUrl,
+      file_size: req.fileAttachment?.fileSize,
+      file_type: req.fileAttachment?.fileType,
+      status: req.status,
+      created_at: req.createdAt
+    }]);
+    if (error) console.error('Supabase insert teaching request error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase insert teaching request exception:', err);
+    return false;
+  }
+}
+
+export async function updateTeachingRequestStatusInSupabase(id: string, status: string, adminNotes?: string): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const payload: Record<string, any> = { status };
+    if (adminNotes !== undefined) payload.admin_notes = adminNotes;
+    const { error } = await supabase.from('teaching_requests').update(payload).eq('id', id);
+    if (error) console.error('Supabase update teaching request error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase update teaching request exception:', err);
+    return false;
+  }
+}
+
+export async function deleteTeachingRequestFromSupabase(id: string): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('teaching_requests').delete().eq('id', id);
+    if (error) console.error('Supabase delete teaching request error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase delete teaching request exception:', err);
+    return false;
+  }
+}
+
+export async function upsertServiceInSupabase(service: Service): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('services').upsert({
+      id: service.id,
+      name: service.name,
+      slug: service.slug,
+      category: service.category,
+      short_description: service.shortDescription,
+      problem: service.problem,
+      solution: service.solution,
+      included_features: service.includedFeatures,
+      tools: service.tools,
+      pricing_model: service.pricingModel || service.pricingType || 'starting_at',
+      starting_price: service.startingPrice,
+      estimated_delivery: service.estimatedDelivery,
+      portfolio_examples: service.portfolioExamples,
+      process: service.process,
+      faqs: service.faqs,
+      icon_name: service.iconName,
+      featured: service.featured ?? false,
+      updated_at: new Date().toISOString()
+    });
+    if (error) console.error('Supabase upsert service error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase upsert service exception:', err);
+    return false;
+  }
+}
+
+export async function upsertProjectInSupabase(project: Project): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('projects').upsert({
+      id: project.id,
+      title: project.title,
+      category: project.category,
+      role: project.role,
+      technologies: project.technologies,
+      tools: project.tools,
+      description: project.description,
+      problem: project.problem,
+      solution: project.solution,
+      project_type: project.projectType,
+      images: project.images,
+      live_url: project.liveUrl,
+      github_url: project.githubUrl,
+      fiverr_url: project.fiverrUrl,
+      upwork_url: project.upworkUrl,
+      featured: project.featured ?? false,
+      date: project.date,
+      updated_at: new Date().toISOString()
+    });
+    if (error) console.error('Supabase upsert project error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase upsert project exception:', err);
+    return false;
+  }
+}
+
+export async function upsertTeachingServiceInSupabase(service: TeachingService): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('teaching_services').upsert({
+      id: service.id,
+      slug: service.slug,
+      title: service.title,
+      category: service.category,
+      subtitle: service.subtitle,
+      short_description: service.shortDescription,
+      description: service.description,
+      who_is_this_for: service.whoIsThisFor,
+      sub_offerings: service.subOfferings,
+      what_is_included: service.whatIsIncluded,
+      deliverables: service.deliverables,
+      sample_preview: service.samplePreview,
+      process: service.process,
+      faqs: service.faqs,
+      pricing_type: service.pricingType,
+      starting_price: service.startingPrice,
+      premium_price: service.premiumPrice,
+      delivery_time: service.deliveryTime,
+      icon: service.icon,
+      enabled: service.enabled,
+      order_index: service.order,
+      updated_at: new Date().toISOString()
+    });
+    if (error) console.error('Supabase upsert teaching service error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase upsert teaching service exception:', err);
+    return false;
+  }
+}
+
+export async function deleteTeachingServiceFromSupabase(id: string): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('teaching_services').delete().eq('id', id);
+    if (error) console.error('Supabase delete teaching service error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase delete teaching service exception:', err);
+    return false;
+  }
+}
+
+export async function upsertTeachingConsultationInSupabase(settings: TeachingConsultationSettings): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { error } = await supabase.from('teaching_consultation').upsert({
+      id: 'current',
+      title: settings.title,
+      headline: settings.headline,
+      subtext: settings.subtext,
+      price: settings.price,
+      duration: settings.duration,
+      topics: settings.topics,
+      enabled: settings.enabled,
+      updated_at: new Date().toISOString()
+    });
+    if (error) console.error('Supabase upsert consultation error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase upsert consultation exception:', err);
+    return false;
+  }
+}
+
+export async function upsertSettingsInSupabase(settings: SiteSettings): Promise<boolean> {
+  const supabase = getServerSupabase();
+  if (!supabase) return false;
+  try {
+    const { adminPasskey, ...publicSettings } = settings;
+    const { error } = await supabase.from('site_settings').upsert({
+      id: 'current',
+      brand_name: publicSettings.brandName,
+      professional_name: publicSettings.professionalName,
+      positioning: publicSettings.positioning,
+      brand_concept: publicSettings.brandConcept,
+      hero_heading: publicSettings.heroHeading,
+      hero_supporting: publicSettings.heroSupporting,
+      hero_description: publicSettings.heroDescription,
+      email: publicSettings.email,
+      whatsapp: publicSettings.whatsapp,
+      location: publicSettings.location,
+      demo_mode: publicSettings.demoMode,
+      show_pricing: publicSettings.showPricing,
+      show_services: publicSettings.showServices,
+      show_features: publicSettings.showFeatures,
+      cta_title: publicSettings.ctaTitle,
+      cta_supporting_text: publicSettings.ctaSupportingText,
+      upgrade_message: publicSettings.upgradeMessage,
+      premium_features: publicSettings.premiumFeatures,
+      updated_at: new Date().toISOString()
+    });
+    if (error) console.error('Supabase upsert settings error:', error);
+    return !error;
+  } catch (err) {
+    console.error('Supabase upsert settings exception:', err);
+    return false;
+  }
+}
+
