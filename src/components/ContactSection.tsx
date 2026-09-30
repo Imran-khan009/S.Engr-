@@ -72,10 +72,10 @@ export const ContactSection: React.FC<ContactSectionProps> = () => {
             <Sparkles className="w-3.5 h-3.5" />
             <span>Direct Client Communications</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 uppercase">
+          <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] tracking-tight text-white mb-4 uppercase">
             FIND ME ONLINE &amp; GET IN TOUCH
           </h2>
-          <p className="text-base sm:text-lg text-slate-300">
+          <p className="font-sans font-normal text-[16px] sm:text-[18px] text-slate-300">
             Reach out directly for custom engineering scopes, website developments, microcontroller prototypes, or verified escrow orders.
           </p>
         </div>

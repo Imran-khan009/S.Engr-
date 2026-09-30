@@ -150,15 +150,15 @@ export const TeachingSection: React.FC<TeachingSectionProps> = ({
             <span>Professional Educational Architecture & Pedagogy</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+          <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] tracking-tight text-white mb-4">
             Teaching & Education Services
           </h2>
 
-          <p className="text-base sm:text-xl font-semibold text-cyan-400 mb-4 max-w-3xl mx-auto">
+          <p className="font-sans text-[16px] sm:text-[18px] font-semibold text-cyan-400 mb-4 max-w-3xl mx-auto">
             Practical support for teachers, instructors, students and training programs.
           </p>
 
-          <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="font-sans font-normal text-[16px] text-slate-300 max-w-2xl mx-auto leading-relaxed">
             I provide educational planning, lesson-plan development, teaching-method support, assessment design and instructor consultation. Not merely standard classroom lecturing, but a comprehensive, professional educational support service built to resolve instructional bottlenecks.
           </p>
         </div>

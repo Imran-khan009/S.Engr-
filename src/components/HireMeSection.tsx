@@ -45,11 +45,11 @@ export const HireMeSection: React.FC<HireMeSectionProps> = ({
           <span>Transparent Engineering & Bespoke Builds</span>
         </div>
 
-        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight uppercase mb-6 leading-tight">
+        <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] text-white tracking-tight uppercase mb-6 leading-tight">
           {ctaTitle}
         </h2>
 
-        <p className="text-base sm:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed font-normal">
+        <p className="font-sans font-normal text-[16px] sm:text-[18px] text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed">
           {ctaSupportingText}
         </p>
 

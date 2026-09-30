@@ -1,12 +1,93 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+:root {
+  --font-heading: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
 html {
   scroll-behavior: smooth;
+  font-family: var(--font-sans);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 0.25vw + 0.95rem, 1.125rem); /* 16px to 18px */
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* User Typography Specification:
+   H1 → Space Grotesk, 56–72px, Bold
+   H2 → Space Grotesk, 36–48px, Bold
+   H3 → Space Grotesk, 24–30px, Semi-Bold
+   Body → Inter, 16–18px, Regular
+   Button → Inter, 14–16px, Semi-Bold
+   Code → JetBrains Mono
+*/
+
+/* H1: Space Grotesk, 56–72px, Bold */
+h1, .h1 {
+  font-family: var(--font-heading) !important;
+  font-size: clamp(3.5rem, 4vw + 1.5rem, 4.5rem) !important; /* 56px to 72px */
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.025em;
+}
+
+/* H2: Space Grotesk, 36–48px, Bold */
+h2, .h2 {
+  font-family: var(--font-heading) !important;
+  font-size: clamp(2.25rem, 2vw + 1rem, 3rem) !important; /* 36px to 48px */
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em;
+}
+
+/* H3: Space Grotesk, 24–30px, Semi-Bold */
+h3, .h3 {
+  font-family: var(--font-heading) !important;
+  font-size: clamp(1.5rem, 0.75vw + 1.15rem, 1.875rem) !important; /* 24px to 30px */
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.015em;
+}
+
+/* Body: Inter, 16–18px, Regular */
+p, .body-text {
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+/* Button: Inter, 14–16px, Semi-Bold */
+button, .btn, [role="button"] {
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+
+button:not(.font-mono), .btn:not(.font-mono) {
+  font-size: clamp(0.875rem, 0.2vw + 0.825rem, 1rem); /* 14px to 16px */
+}
+
+/* Code: JetBrains Mono */
+code, pre, kbd, samp, .font-mono {
+  font-family: var(--font-mono) !important;
+}
+
+.font-heading, .font-space {
+  font-family: var(--font-heading) !important;
+}
+
+.font-sans, .font-inter {
+  font-family: var(--font-sans) !important;
 }
 
 /* Custom subtle scrollbar */

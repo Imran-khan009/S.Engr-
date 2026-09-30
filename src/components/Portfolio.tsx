@@ -37,11 +37,11 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
               <span>Real-World Proof of Work</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight uppercase">
+            <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] text-white tracking-tight uppercase">
               Featured Projects
             </h2>
           </div>
-          <p className="mt-3 md:mt-0 text-sm text-slate-400 max-w-md font-mono">
+          <p className="mt-3 md:mt-0 font-sans font-normal text-[16px] text-slate-300 max-w-md">
             Every project documented with practical hardware schematics, system architecture, and real-world execution narratives.
           </p>
         </div>
@@ -55,9 +55,9 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
               <button
                 key={label}
                 onClick={() => setActiveCategory(rawCat)}
-                className={`whitespace-nowrap px-4 py-2 rounded-xl text-xs font-semibold tracking-wider transition-all duration-200 cursor-pointer ${
+                className={`whitespace-nowrap px-4 py-2 rounded-xl font-sans font-semibold text-[14px] tracking-wider transition-all duration-200 cursor-pointer ${
                   isSelected
-                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20 font-bold'
+                    ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
                     : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
                 }`}
               >
@@ -112,7 +112,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ projects, onRequestSimilar
                     <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-0.5 truncate">
                       {project.category}
                     </span>
-                    <h3 className="text-base font-bold text-white group-hover:text-orange-400 transition-colors truncate">
+                    <h3 className="font-heading font-semibold text-[20px] sm:text-[24px] text-white group-hover:text-orange-400 transition-colors truncate">
                       {project.title}
                     </h3>
                   </div>

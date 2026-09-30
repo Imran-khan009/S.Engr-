@@ -54,10 +54,10 @@ export const FaqSection: React.FC = () => {
             <HelpCircle className="w-3.5 h-3.5" />
             <span>Frequently Asked Questions</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 uppercase">
+          <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] tracking-tight text-white mb-4 uppercase">
             COMMON INQUIRIES
           </h2>
-          <p className="text-base sm:text-lg text-slate-300">
+          <p className="font-sans font-normal text-[16px] sm:text-[18px] text-slate-300">
             Clear, transparent answers regarding project pricing, delivery turnaround, IoT prototypes, websites, and instructional training.
           </p>
         </div>

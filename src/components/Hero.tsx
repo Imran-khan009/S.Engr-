@@ -66,25 +66,8 @@ export const Hero: React.FC<HeroProps> = ({ onHireMe, onExploreWork, onOpenCvMod
           {/* Left Column: Brand, Headline, Supporting Text, Description, CTAs, Social Dock (7 cols) */}
           <div className="lg:col-span-7 flex flex-col text-center lg:text-left">
             
-            {/* Top Brand & Eyebrow: Original S • ENGR Mark */}
-            <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
-              <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-xs font-semibold tracking-wider text-slate-200">
-                  S • ENGR
-                </span>
-                <span className="text-slate-600">|</span>
-                <span className="text-[11px] font-mono text-slate-400">
-                  Engr. Imran Khan
-                </span>
-              </div>
-              <span className="hidden sm:inline-block text-xs font-mono text-slate-500">
-                Hub, Balochistan
-              </span>
-            </div>
-
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-5 leading-[1.12]">
+            <h1 className="font-heading font-bold text-[56px] sm:text-[64px] lg:text-[72px] leading-[1.08] tracking-tight text-white mb-5">
               I Build Digital Systems That Move Ideas Forward.
             </h1>
 
@@ -102,7 +85,7 @@ export const Hero: React.FC<HeroProps> = ({ onHireMe, onExploreWork, onOpenCvMod
             </div>
 
             {/* Description */}
-            <p className="text-base sm:text-lg text-slate-300 font-normal leading-relaxed mb-8 max-w-2xl mx-auto lg:mx-0">
+            <p className="font-sans font-normal text-[16px] sm:text-[18px] text-slate-300 leading-relaxed mb-8 max-w-2xl mx-auto lg:mx-0">
               I build websites, software, connected systems and digital experiences — while helping businesses, creators and learners turn ideas into practical solutions.
             </p>
 
@@ -113,7 +96,7 @@ export const Hero: React.FC<HeroProps> = ({ onHireMe, onExploreWork, onOpenCvMod
               <button
                 id="hero-cta-start-project"
                 onClick={handleStartProject}
-                className="group relative px-7 py-3.5 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:-translate-y-0.5 flex items-center gap-2.5 cursor-pointer"
+                className="group relative px-7 py-3.5 rounded-xl font-sans font-semibold text-[14px] sm:text-[16px] text-white bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 hover:from-orange-400 hover:to-amber-500 transition-all duration-300 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:-translate-y-0.5 flex items-center gap-2.5 cursor-pointer"
               >
                 <span>Start a Project</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -124,7 +107,7 @@ export const Hero: React.FC<HeroProps> = ({ onHireMe, onExploreWork, onOpenCvMod
                 id="hero-cta-explore-work"
                 href="#work"
                 onClick={handleScrollToWork}
-                className="group px-6 py-3.5 rounded-xl font-semibold text-sm text-slate-200 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700/80 hover:border-slate-500 hover:text-white transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer shadow-sm"
+                className="group px-6 py-3.5 rounded-xl font-sans font-semibold text-[14px] sm:text-[16px] text-slate-200 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-700/80 hover:border-slate-500 hover:text-white transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer shadow-sm"
               >
                 <span>Explore My Work</span>
                 <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />

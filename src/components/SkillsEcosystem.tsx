@@ -35,10 +35,10 @@ export const SkillsEcosystem: React.FC<SkillsEcosystemProps> = ({
             <Sparkles className="w-3.5 h-3.5" />
             <span>Interactive Competency Matrix</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 uppercase">
+          <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] tracking-tight text-white mb-4 uppercase">
             SKILLS ECOSYSTEM
           </h2>
-          <p className="text-sm sm:text-base text-slate-400">
+          <p className="font-sans font-normal text-[16px] sm:text-[18px] text-slate-300">
             A comprehensive matrix of core technical competencies, software toolchains, and field capabilities without arbitrary percentage meters.
           </p>
         </div>

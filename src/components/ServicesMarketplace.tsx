@@ -203,14 +203,10 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-orange-950/40 border border-orange-500/30 text-orange-400 font-mono text-xs uppercase tracking-wider mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Professional Capabilities</span>
-          </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 uppercase">
+          <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] tracking-tight text-white mb-4 uppercase">
             SERVICES
           </h2>
-          <p className="text-base sm:text-lg text-slate-300">
+          <p className="font-sans font-normal text-[16px] sm:text-[18px] text-slate-300">
             A single, comprehensive service catalog spanning engineering, digital execution, and creative media with transparent pricing.
           </p>
         </div>
@@ -235,7 +231,7 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
                 </div>
 
                 {/* Service Title */}
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
+                <h3 className="font-heading font-semibold text-[24px] sm:text-[26px] lg:text-[30px] text-white mb-2 group-hover:text-orange-400 transition-colors">
                   {service.name}
                 </h3>
 
@@ -273,7 +269,7 @@ export const ServicesMarketplace: React.FC<ServicesMarketplaceProps> = ({
                 <button
                   id={`btn-view-details-${service.id}`}
                   onClick={() => onViewDetails(service)}
-                  className="w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider text-slate-100 bg-slate-800 hover:bg-orange-500 hover:text-white border border-slate-700 hover:border-orange-500 transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer"
+                  className="w-full py-3 px-4 rounded-xl font-sans font-semibold text-[14px] uppercase tracking-wider text-slate-100 bg-slate-800 hover:bg-orange-500 hover:text-white border border-slate-700 hover:border-orange-500 transition-all duration-200 flex items-center justify-center space-x-2 shadow-sm cursor-pointer"
                 >
                   <span>View Details</span>
                   <ArrowRight className="w-3.5 h-3.5" />

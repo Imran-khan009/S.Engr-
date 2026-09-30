@@ -60,11 +60,11 @@ export const QuickIntro: React.FC<QuickIntroProps> = ({ onExploreCategory }) => 
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
               <span>Core Disciplines</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] text-white tracking-tight">
               What I Do
             </h2>
           </div>
-          <p className="mt-3 md:mt-0 text-sm text-slate-400 max-w-md font-mono">
+          <p className="mt-3 md:mt-0 font-sans font-normal text-[16px] text-slate-400 max-w-md">
             Bridging software code, physical hardware, visual creativity, and civil site engineering with disciplined execution.
           </p>
         </div>

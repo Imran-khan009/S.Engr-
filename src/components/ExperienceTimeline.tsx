@@ -118,10 +118,10 @@ export const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Verified Career Record</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 uppercase">
+          <h2 className="font-heading font-bold text-[36px] sm:text-[42px] lg:text-[48px] tracking-tight text-white mb-4 uppercase">
             EXPERIENCE &amp; EDUCATION
           </h2>
-          <p className="text-sm sm:text-base text-slate-300">
+          <p className="font-sans font-normal text-[16px] sm:text-[18px] text-slate-300">
             Ground-level youth vocational instruction under international programs, technical site engineering, and formal academic degrees.
           </p>
         </div>
@@ -136,7 +136,7 @@ export const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({
               <span className="text-[10px] font-mono uppercase tracking-wider text-orange-400 font-bold block">
                 Educational Mentorship
               </span>
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="font-heading font-semibold text-[20px] sm:text-[24px] text-white">
                 For Students / Institutes → View Teaching Services
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
